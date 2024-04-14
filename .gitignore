@@ -1,0 +1,13 @@
+# venv #
+venv
+.venv
+
+# Django #
+*.pot
+*.pyc
+*.log
+__pycache__
+core/settings_local.py
+
+# Pycharm #
+.idea

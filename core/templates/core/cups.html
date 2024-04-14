@@ -1,0 +1,37 @@
+{% extends 'core/base/base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* Custom class for adjusting image width */
+    .custom-img {
+        width: 150px;
+        display: block;
+        margin: 5px auto;
+    }
+</style>
+
+<div class="container mx-auto">
+    <div class="text-center mt-5">
+        <h1 class="mb-5">Turnaje</h1>
+
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for cup in iihf_cups %}
+                <div class="col">
+                    <a href="{% url 'iihf-home' year=cup.year %}" style="text-decoration: none; color: inherit;">
+                        <div class="card h-100">
+                            <img src="{{ cup.logo.url }}" class="card-img-top custom-img" alt="Cup Image">
+                            <div class="card-body">
+                                <h5 class="card-title">IIHF {{ cup.year }}</h5>
+                                <p class="card-text">{{ cup.location }}</p>
+                                <p class="card-text"><small class="text-muted">{{ cup.date_start }} - {{ cup.date_end }}</small></p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

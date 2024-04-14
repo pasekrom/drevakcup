@@ -1,0 +1,72 @@
+{% extends 'core/base/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="text-center mt-5">
+        <h1 class="mb-5">Pravidla</h1>
+        <div class="accordion accordion-flush" id="accordionFlushExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="flush-headingOne">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                1. část
+              </button>
+            </h2>
+            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+              <div class="accordion-body">
+                <nl>
+                  <li>Uhádnutí vítěze zápasu/remízy (základní hrací doba): 3 body</li>
+                  <li>Přesný typ zápasu: 7 bodů</li>
+                </nl>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="flush-headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                2. část
+              </button>
+            </h2>
+            <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+              <div class="accordion-body">
+                <nl>
+                  <li>Tým, který vstřelí nejvíce branek (celkem na MS bez nájezdů v prodloužení): 12 bodů</li>
+                  <li>Tým, který obdrží nejméně branek (celkem na MS bez nájezdů v prodloužení): 12 bodů</li>
+                  <li>Tým, který vstřelí první branku: 3 body</li>
+                  <li>Tým, který vstřelí poslední branku na MS: 12 bodů</li>
+                  <li>Tým, který sestoupí ze skupiny A: 6 bodů</li>
+                  <li>Tým, který sestoupí ze skupiny B: 6 bodů</li>
+                  <li>Počet remíz/prodloužení za celé MS: 24 bodů</li>
+                  <li>Nejvíce branek na MS v jednom utkání (počet dohromady za oba týmy v ZHD): 12 bodů</li>
+                  <li>Tým 1, který se utká o bronz: 12 bodů</li>
+                  <li>Tým 2, který se utká o bronz: 12 bodů</li>
+                  <li>Finalista: 16 bodů</li>
+                  <li>Vítěz: 24 bodů</li>
+                  <li>Vítěz každé skupiny (A, B): 9 bodů</li>
+                  <li>2. - 4. místo každé skupiny (A, B): 6 bodů</li>
+                  <li>Střelec 1. gólu ČR: 12 bodů</li>
+                  <li>Střelec posledního gólu ČR: 12 bodů</li>
+                </nl>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="flush-headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                Kritéria při rovnosti bodů
+              </button>
+            </h2>
+            <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+              <div class="accordion-body">
+                <nl>
+                  <li>Lepší umístění v části A (horní)</li>
+                  <li>Uhádnutí celkového vítěze</li>
+                  <li>Vyšší počet přesných typů za 7 bodů v části A (horní)</li>
+                  <li>Uhádnutí druhého finalisty</li>
+                </nl>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

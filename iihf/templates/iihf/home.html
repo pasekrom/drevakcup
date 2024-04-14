@@ -1,0 +1,500 @@
+{% extends 'core/base/base.html' %}
+{% load static %}
+{% load filters %}
+{% block content %}
+<style>
+.table-container {
+    overflow-x: auto;
+}
+
+.team-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Optional: adds an ellipsis (...) for overflow */
+    max-width: 200px; /* Optional: set a maximum width for the cell */
+}
+
+.team-flag {
+    width: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+colgroup col.color1 {
+  background-color: rgba(255, 0, 0, 0.05); /* Red */
+}
+
+colgroup col.color2 {
+  background-color: rgba(0, 0, 255, 0.05); /* Blue */
+}
+
+colgroup col.color3 {
+  background-color: rgba(0, 255, 0, 0.05); /* Green */
+}
+
+colgroup col.color4 {
+  background-color: rgba(128, 0, 128, 0.05); /* Purple */
+}
+
+colgroup col.color5 {
+  background-color: rgba(255, 255, 0, 0.05); /* Yellow */
+}
+</style>
+
+<div class="container">
+
+    <div class="text-center mt-5">
+        <h1 class="mb-5">1. část</h1>
+        <div class="table-container">
+            <table class="table table-hover mb-5">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col">Hra</th>
+                  <th scope="col">Datum</th>
+                  <th scope="col">Výsledek</th>
+                  {% for user in users %}
+                    <th scope="col">{{ user.name }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+
+                {% for match in match_list %}
+                <tr>
+                  <th scope="row" class="team-cell">
+                    <img src="{{ match.team_a.flag.url }}" class="team-flag"> {{ match.team_a.name }} - {{ match.team_b.name }} <img src="{{ match.team_b.flag.url }}" class="team-flag">
+                  </th>
+                  <td><small>{{ match.date|date:"j. E H:i" }}</small></td>
+                  <th>{% if match.score_a %}{{ match.score_a }}:{{ match.score_b }}{% endif %}</th>
+                  {% for user in users %}
+                    <td>
+                      {% for match_tip in all_match_tips %}
+                        {% if match_tip.user == user and match_tip.match == match %}
+                          {% if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b %}<b><u>{{ match_tip.score_a }}:{{ match_tip.score_b }}</u></b>
+                          {% elif match.score_a > match.score_b and match_tip.score_a > match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                          {% elif match.score_a < match.score_b and match_tip.score_a < match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                          {% elif match.score_a == match.score_b and match_tip.score_a == match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                          {% else %}
+                          {{ match_tip.score_a }}:{{ match_tip.score_b }}{% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="col">Celkem</th>
+                  <td></td>
+                  <td></td>
+                  {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+              </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <h1 class="mb-5">2. část</h1>
+        <div class="table-container">
+            <table class="table table-hover mb-5">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Bodů</th>
+                  <th scope="col">Výsledek</th>
+                  {% for user in users %}
+                    <th scope="col">{{ user.name }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Vítěz</td>
+                  <td>24</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Finalista 1</td>
+                  <td>16</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Finalista 2</td>
+                  <td>16</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým 1, který se utká o bronz</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým 2, který se utká o bronz</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Český střelec 1. gólu</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Český střelec posledního gólu</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Nejvíce branek v jednom utkání (dohromady)</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Vítěz skupiny A</td>
+                  <td>9</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Vítěz skupiny B</td>
+                  <td>9</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>2. místo ve skupině A</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>2. místo ve skupině B</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>3. místo ve skupině A</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>3. místo ve skupině B</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>4. místo ve skupině A</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>4. místo ve skupině B</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým, který vstřelí nejvíce branek (celkem na MS)</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým, který obdrží nejméně branek (celkem na MS)</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým, který vstřelí první branku na MS</td>
+                  <td>3</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým, který vstřelí poslední branku na MS</td>
+                  <td>12</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým, který sestoupí ve skupině A</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Tým, který sestoupí ve skupině B</td>
+                  <td>6</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Počet remíz/prodloužení (celkem za MS)</td>
+                  <td>24</td>
+                  <td></td>
+                    {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="col">Celkem</th>
+                  <td></td>
+                  <td></td>
+                  {% for user in users %}
+                    <td scope="col"></td>
+                  {% endfor %}
+                </tr>
+              </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <h1 class="mb-5">Součty bodů</h1>
+        <div class="table-container">
+            <table class="table table-hover mb-5">
+                <colgroup>
+                    <col>
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                    <col span="1" class="color1">
+                    <col span="1" class="color2">
+                    <col span="1" class="color3">
+                    <col span="1" class="color4">
+                    <col span="1" class="color5">
+                </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  {% for user in users %}
+                    <th scope="col">{{ user.name }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="col">1. část</th>
+                  {% for user in users %}
+                    <th scope="col"></th>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <th scope="col">2. část</th>
+                  {% for user in users %}
+                    <th scope="col"></th>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <th scope="col">celkem</th>
+                  {% for user in users %}
+                    <th scope="col"></th>
+                  {% endfor %}
+                </tr>
+              </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

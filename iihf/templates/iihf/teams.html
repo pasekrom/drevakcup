@@ -1,0 +1,269 @@
+{% extends 'core/base/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+.table-container {
+    overflow-x: auto;
+}
+
+.team-flag {
+    width: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</style>
+
+<div class="container">
+    <div class="text-center mt-5">
+        <h1 class="mb-5">Týmy</h1>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-tab-pane" type="button" role="tab" aria-controls="all-tab-pane" aria-selected="true">Vše</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="group-a-tab" data-bs-toggle="tab" data-bs-target="#group-a-tab-pane" type="button" role="tab" aria-controls="group-a-tab-pane" aria-selected="false">Skupina A</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="group-b-tab" data-bs-toggle="tab" data-bs-target="#group-b-tab-pane" type="button" role="tab" aria-controls="group-b-tab-pane" aria-selected="false">Skupina B</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="playoff-tab" data-bs-toggle="tab" data-bs-target="#playoff-tab-pane" type="button" role="tab" aria-controls="playoff-tab-pane" aria-selected="false">Playoff</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabindex="0">
+            <div class="table-container">
+            <table class="table table-hover mb-5">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Tým</th>
+                  <th scope="col">Odehráno</th>
+                  <th scope="col">Výhry</th>
+                  <th scope="col">Prohry</th>
+                  <th scope="col">Výhry OT</th>
+                  <th scope="col">Prohry OT</th>
+                  <th scope="col">Góly vstřelené</th>
+                  <th scope="col">Góly obdržené</th>
+                  <th scope="col">Bodů celkem</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for team in teams %}
+              {% if not team.name == '???' %}
+                <tr>
+                  <th scope="row"><img src="{{ team.flag.url }}" class="team-flag"></th>
+                  <td>{{ team.name }}</td>
+                  <td>{{ team.gp }}</td>
+                  <td>{{ team.win }}</td>
+                  <td>{{ team.los }}</td>
+                  <td>{{ team.wot }}</td>
+                  <td>{{ team.lot }}</td>
+                  <td>{{ team.gf }}</td>
+                  <td>{{ team.ga }}</td>
+                  <th>{{ team.points }}</th>
+                </tr>
+              {% endif %}
+              {% endfor %}
+              </tbody>
+            </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="group-a-tab-pane" role="tabpanel" aria-labelledby="group-a-tab" tabindex="0">
+            <div class="table-container">
+            <table class="table table-hover mb-5">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Tým</th>
+                  <th scope="col">Odehráno</th>
+                  <th scope="col">Výhry</th>
+                  <th scope="col">Prohry</th>
+                  <th scope="col">Výhry OT</th>
+                  <th scope="col">Prohry OT</th>
+                  <th scope="col">Góly vstřelené</th>
+                  <th scope="col">Góly obdržené</th>
+                  <th scope="col">Bodů celkem</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for team in teams_a %}
+              {% if not team.name == '???' %}
+                <tr>
+                  <th scope="row"><img src="{{ team.flag.url }}" class="team-flag"></th>
+                  <td>{{ team.name }}</td>
+                  <td>{{ team.gp }}</td>
+                  <td>{{ team.win }}</td>
+                  <td>{{ team.los }}</td>
+                  <td>{{ team.wot }}</td>
+                  <td>{{ team.lot }}</td>
+                  <td>{{ team.gf }}</td>
+                  <td>{{ team.ga }}</td>
+                  <th>{{ team.points }}</th>
+                </tr>
+              {% endif %}
+              {% endfor %}
+              </tbody>
+            </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="group-b-tab-pane" role="tabpanel" aria-labelledby="group-b-tab" tabindex="0">
+            <div class="table-container">
+            <table class="table table-hover mb-5">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Tým</th>
+                  <th scope="col">Odehráno</th>
+                  <th scope="col">Výhry</th>
+                  <th scope="col">Prohry</th>
+                  <th scope="col">Výhry OT</th>
+                  <th scope="col">Prohry OT</th>
+                  <th scope="col">Góly vstřelené</th>
+                  <th scope="col">Góly obdržené</th>
+                  <th scope="col">Bodů celkem</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for team in teams_b %}
+              {% if not team.name == '???' %}
+                <tr>
+                  <th scope="row"><img src="{{ team.flag.url }}" class="team-flag"></th>
+                  <td>{{ team.name }}</td>
+                  <td>{{ team.gp }}</td>
+                  <td>{{ team.win }}</td>
+                  <td>{{ team.los }}</td>
+                  <td>{{ team.wot }}</td>
+                  <td>{{ team.lot }}</td>
+                  <td>{{ team.gf }}</td>
+                  <td>{{ team.ga }}</td>
+                  <th>{{ team.points }}</th>
+                </tr>
+              {% endif %}
+              {% endfor %}
+              </tbody>
+            </table>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="playoff-tab-pane" role="tabpanel" aria-labelledby="playoff-tab" tabindex="0">
+
+            <div class="card mb-4 mt-3">
+              <div class="card-header">
+                <h2 class="text-center">Čtvrtfinále</h2>
+              </div>
+              <div class="card-body">
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'QFA1' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'QFA2' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'QFB1' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'QFB2' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header">
+                <h2 class="text-center">Semifinále</h2>
+              </div>
+              <div class="card-body">
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'SFA' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'SFB' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header">
+                <h2 class="text-center">Hra o bronz</h2>
+              </div>
+              <div class="card-body">
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'BMG' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+              </div>
+            </div>
+
+            <div class="card mb-5">
+              <div class="card-header">
+                <h2 class="text-center">Hra o zlato</h2>
+              </div>
+              <div class="card-body">
+                <p>
+                  {% for playoff in playoff_list %}
+                  {% if playoff.playoff == 'GMG' %}
+                  <img src="{{ playoff.team_a.flag.url }}" class="team-flag">{{ playoff.team_a.name }}
+                  vs.
+                  <img src="{{ playoff.team_b.flag.url }}" class="team-flag">{{ playoff.team_b.name }}
+                  <br><small class="text-muted">{{ playoff.date }}</small>
+                  {% endif %}
+                  {% endfor %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

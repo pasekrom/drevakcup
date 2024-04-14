@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+  {% include 'core/base/head.html' %}
+</head>
+
+<body>
+  {% if 'iihf' in request.path %}
+    {% include 'iihf/header.html' %}
+  {% else %}
+    {% include 'core/base/header.html' %}
+  {% endif %}
+  {% block content %}
+  {% endblock content %}
+  {% include 'core/base/js.html' %}
+</body>
+
+</html>
