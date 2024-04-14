@@ -7,7 +7,7 @@ venv
 *.pyc
 *.log
 __pycache__
-core/settings_local.py
+core/settings.py
 
 # Pycharm #
 .idea
