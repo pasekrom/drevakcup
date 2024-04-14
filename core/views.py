@@ -1,5 +1,11 @@
-from django.views.generic import TemplateView
+from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, CreateView
 
+from core.forms import CustomUserCreationForm
 from iihf.models import Cup
 
 
@@ -21,3 +27,21 @@ class Cups(TemplateView):
 
         context['iihf_cups'] = iihf_cups
         return context
+
+
+class SignUpView(CreateView):
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'core/signup.html'
+
+
+class MyLoginView(LoginView):
+    form_class = AuthenticationForm
+    redirect_authenticated_user = True
+    template_name = 'core/login.html'
+
+
+def logout_page(request):
+    logout(request)
+    return redirect('/')
+
