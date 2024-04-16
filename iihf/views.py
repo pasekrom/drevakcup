@@ -97,7 +97,10 @@ class MatchTipFormView(FormView):
         matches = Match.objects.filter(cup__year=kwargs.get('year')).order_by('date', 'team_a__group')
         match_tips = {}
         for match in matches:
-            match_tip = get_object_or_404(MatchTip, match=match, user=request.user)
+            try:
+                match_tip = MatchTip.objects.get(match=match, user=request.user)
+            except MatchTip.DoesNotExist:
+                match_tip = None
             match_tips[match.id] = match_tip
         initial_values = {}
         for match_id, match_tip in match_tips.items():
