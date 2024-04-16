@@ -43,8 +43,10 @@ colgroup col.color5 {
 
 <div class="container">
 
+
+
     <div class="text-center mt-5">
-        <h1 class="mb-5">1. část</h1>
+        <h1 class="mb-5">1. část {% if not started %}<a class="btn btn-success" href="{% url 'iihf-match-tip' year=year %}">Vyplnit svoje tipy</a>{% endif %}</h1>
         <div class="table-container">
             <table class="table table-hover mb-5">
                 <colgroup>
@@ -120,12 +122,20 @@ colgroup col.color5 {
                     <td>
                       {% for match_tip in all_match_tips %}
                         {% if match_tip.user == user and match_tip.match == match %}
-                          {% if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b %}<b><u>{{ match_tip.score_a }}:{{ match_tip.score_b }}</u></b>
-                          {% elif match.score_a > match.score_b and match_tip.score_a > match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
-                          {% elif match.score_a < match.score_b and match_tip.score_a < match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
-                          {% elif match.score_a == match.score_b and match_tip.score_a == match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                        {% if request.user == user or started %}
+                          {% if match.score_a or match.score_b is not null %}
+                            {% if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b %}<b><u>{{ match_tip.score_a }}:{{ match_tip.score_b }}</u></b>
+                            {% elif match.score_a > match.score_b and match_tip.score_a > match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                            {% elif match.score_a < match.score_b and match_tip.score_a < match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                            {% elif match.score_a == match.score_b and match_tip.score_a == match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
+                            {% else %}
+                            {{ match_tip.score_a }}:{{ match_tip.score_b }}{% endif %}
                           {% else %}
-                          {{ match_tip.score_a }}:{{ match_tip.score_b }}{% endif %}
+                            <i>{{ match_tip.score_a }}:{{ match_tip.score_b }}</i>
+                          {% endif %}
+                        {% else %}
+                        ???
+                        {% endif %}
                         {% endif %}
                       {% endfor %}
                     </td>
@@ -149,7 +159,7 @@ colgroup col.color5 {
     </div>
 
     <div class="text-center mt-5">
-        <h1 class="mb-5">2. část</h1>
+        <h1 class="mb-5">2. část {% if not started %}<a class="btn btn-success" href="{% url 'iihf-special-tip' year=year %}">Vyplnit svoje tipy</a>{% endif %}</h1>
         <div class="table-container">
             <table class="table table-hover mb-5">
                 <colgroup>
@@ -216,186 +226,324 @@ colgroup col.color5 {
                 <tr>
                   <td>Vítěz</td>
                   <td>24</td>
-                  <td></td>
+                  <td>{{ special.winner.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.winner.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Finalista 1</td>
                   <td>16</td>
-                  <td></td>
+                  <td>{{ special.final_a.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.final_a.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Finalista 2</td>
                   <td>16</td>
-                  <td></td>
+                  <td>{{ special.final_b.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.final_b.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým 1, který se utká o bronz</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.bronze_a.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.bronze_a.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým 2, který se utká o bronz</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.bronze_b.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.bronze_b.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Český střelec 1. gólu</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.czech_shooter_first }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.czech_shooter_first }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Český střelec posledního gólu</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.czech_shooter_last }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.czech_shooter_last }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Nejvíce branek v jednom utkání (dohromady)</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.max_goals_per_game }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.max_goals_per_game }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Vítěz skupiny A</td>
                   <td>9</td>
-                  <td></td>
+                  <td>{{ special.group_a_1.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_a_1.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Vítěz skupiny B</td>
                   <td>9</td>
-                  <td></td>
+                  <td>{{ special.group_b_1.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_b_1.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>2. místo ve skupině A</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.group_a_2.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_a_2.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>2. místo ve skupině B</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.group_b_2.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_b_2.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>3. místo ve skupině A</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.group_a_3.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_a_3.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>3. místo ve skupině B</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.group_b_3.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_b_3.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>4. místo ve skupině A</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.group_a_4.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_a_4.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>4. místo ve skupině B</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.group_b_4.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.group_b_4.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým, který vstřelí nejvíce branek (celkem na MS)</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.team_most_goals.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.team_most_goals.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým, který obdrží nejméně branek (celkem na MS)</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.team_least_goals.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.team_least_goals.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým, který vstřelí první branku na MS</td>
                   <td>3</td>
-                  <td></td>
+                  <td>{{ special.team_first_goal.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.team_first_goal.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým, který vstřelí poslední branku na MS</td>
                   <td>12</td>
-                  <td></td>
+                  <td>{{ special.team_last_goal.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.team_last_goal.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým, který sestoupí ve skupině A</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.team_drop_a.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.team_drop_a.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Tým, který sestoupí ve skupině B</td>
                   <td>6</td>
-                  <td></td>
+                  <td>{{ special.team_drop_b.name }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.team_drop_b.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
                 <tr>
                   <td>Počet remíz/prodloužení (celkem za MS)</td>
                   <td>24</td>
-                  <td></td>
+                  <td>{{ special.overtimes }}</td>
                     {% for user in users %}
-                    <td scope="col"></td>
-                  {% endfor %}
+                    <td scope="col">
+                        {% for tip in special_tips %}
+                            {% if tip.user == user %}
+                                {{ tip.overtimes }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    {% endfor %}
                 </tr>
               </tbody>
               <tfoot>

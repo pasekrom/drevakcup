@@ -79,3 +79,61 @@ class MatchTip(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.match}'
+
+
+class Special(models.Model):
+    winner = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_winner_special_tips')
+    final_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_final_a_special_tips')
+    final_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_final_b_special_tips')
+    bronze_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_bronze_a_special_tips')
+    bronze_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_bronze_b_special_tips')
+    czech_shooter_first = models.CharField(max_length=64, blank=True)
+    czech_shooter_last = models.CharField(max_length=64, blank=True)
+    max_goals_per_game = models.IntegerField(default=0)
+    group_a_1 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_a_1_special_tips')
+    group_b_1 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_b_1_special_tips')
+    group_a_2 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_a_2_special_tips')
+    group_b_2 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_b_2_special_tips')
+    group_a_3 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_a_3_special_tips')
+    group_b_3 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_b_3_special_tips')
+    group_a_4 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_a_4_special_tips')
+    group_b_4 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_group_b_4_special_tips')
+    team_most_goals = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_team_most_goals_special_tips')
+    team_least_goals = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_team_least_goals_special_tips')
+    team_first_goal = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_team_first_goal_special_tips')
+    team_last_goal = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_team_last_goal_special_tips')
+    team_drop_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_team_drop_a_special_tips')
+    team_drop_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='sp_team_drop_b_special_tips')
+    overtimes = models.IntegerField(default=0)
+    cup = models.ForeignKey('Cup', on_delete=models.CASCADE, related_name='sp_cup')
+
+
+class SpecialTip(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    winner = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='winner_special_tips')
+    final_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='final_a_special_tips')
+    final_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='final_b_special_tips')
+    bronze_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='bronze_a_special_tips')
+    bronze_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='bronze_b_special_tips')
+    czech_shooter_first = models.CharField(max_length=64, blank=True)
+    czech_shooter_last = models.CharField(max_length=64, blank=True)
+    max_goals_per_game = models.IntegerField(default=0)
+    group_a_1 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_a_1_special_tips')
+    group_b_1 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_b_1_special_tips')
+    group_a_2 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_a_2_special_tips')
+    group_b_2 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_b_2_special_tips')
+    group_a_3 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_a_3_special_tips')
+    group_b_3 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_b_3_special_tips')
+    group_a_4 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_a_4_special_tips')
+    group_b_4 = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='group_b_4_special_tips')
+    team_most_goals = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='team_most_goals_special_tips')
+    team_least_goals = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='team_least_goals_special_tips')
+    team_first_goal = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='team_first_goal_special_tips')
+    team_last_goal = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='team_last_goal_special_tips')
+    team_drop_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='team_drop_a_special_tips')
+    team_drop_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='team_drop_b_special_tips')
+    overtimes = models.IntegerField(default=0)
+    cup = models.ForeignKey('Cup', on_delete=models.CASCADE, related_name='cup')
+
+    def __str__(self):
+        return f'{self.user}'

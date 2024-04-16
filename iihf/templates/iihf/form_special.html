@@ -1,0 +1,24 @@
+{% extends 'core/base/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+.team-flag {
+    width: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</style>
+
+<div class="container">
+    <div class="row justify-content-center mt-5 mb-5"> <!-- Add these classes -->
+        <div class="col-md-8"> <!-- Optionally, you can specify the width of the form -->
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

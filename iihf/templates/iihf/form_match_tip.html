@@ -1,0 +1,33 @@
+{% extends 'core/base/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+.team-flag {
+    width: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</style>
+
+<div class="container">
+    <div class="row justify-content-center mt-5 mb-5"> <!-- Add these classes -->
+        <div class="col-md-8"> <!-- Optionally, you can specify the width of the form -->
+            <form method="post">
+                {% csrf_token %}
+                {% for match in matches %}
+                <div class="mb-3">
+                    <h5><img src="{{ match.team_a.flag.url }}" class="team-flag"> {{ match.team_a.name }} - {{ match.team_b.name }} <img src="{{ match.team_b.flag.url }}" class="team-flag"> {{ match.date|date:"j. E H:i" }}</h5>
+                    <input type="hidden" name="match_id" value="{{ match.id }}">
+                    <label for="id_score_a_{{ match.id }}"></label>
+                    <input type="number" name="score_a_{{ match.id }}" id="id_score_a_{{ match.id }}" value="0" required>
+                    <label for="id_score_b_{{ match.id }}">:</label>
+                    <input type="number" name="score_b_{{ match.id }}" id="id_score_b_{{ match.id }}" value="0" required>
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

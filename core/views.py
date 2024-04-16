@@ -1,5 +1,6 @@
 from django.contrib.auth import logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -12,12 +13,20 @@ from iihf.models import Cup
 class Home(TemplateView):
     template_name = 'core/home.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-class User(TemplateView):
+        iihf_cup = Cup.objects.order_by('-year').first()
+
+        context['cup'] = iihf_cup
+        return context
+
+
+class User(LoginRequiredMixin, TemplateView):
     template_name = 'core/user.html'
 
 
-class Cups(TemplateView):
+class Cups(LoginRequiredMixin, TemplateView):
     template_name = 'core/cups.html'
 
     def get_context_data(self, **kwargs):
