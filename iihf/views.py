@@ -118,26 +118,28 @@ class MatchTipFormView(FormView):
             score_a = request.POST.get(f'score_a_{match.id}')
             score_b = request.POST.get(f'score_b_{match.id}')
 
-            # Check if MatchTip already exists for the current user and match
-            try:
-                match_tip = MatchTip.objects.get(match=match, user=request.user)
-            except MatchTip.DoesNotExist:
-                match_tip = None
+            # Check if both scores are provided
+            if score_a is not None and score_b is not None:
+                # Check if MatchTip already exists for the current user and match
+                try:
+                    match_tip = MatchTip.objects.get(match=match, user=request.user)
+                except MatchTip.DoesNotExist:
+                    match_tip = None
 
-            # Update or create MatchTip instance
-            if match_tip:
-                # MatchTip already exists, update scores
-                match_tip.score_a = score_a
-                match_tip.score_b = score_b
-                match_tip.save()
-            else:
-                # MatchTip doesn't exist, create new instance
-                MatchTip.objects.create(
-                    match=match,
-                    user=request.user,
-                    score_a=score_a,
-                    score_b=score_b
-                )
+                # Update or create MatchTip instance
+                if match_tip:
+                    # MatchTip already exists, update scores
+                    match_tip.score_a = score_a
+                    match_tip.score_b = score_b
+                    match_tip.save()
+                else:
+                    # MatchTip doesn't exist, create new instance
+                    MatchTip.objects.create(
+                        match=match,
+                        user=request.user,
+                        score_a=score_a,
+                        score_b=score_b
+                    )
 
         return redirect('iihf-home', year=kwargs.get('year'))
 
