@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, FormView
 
 from core.models import User
 from iihf.forms import MatchTipForm, SpecialTipForm
-from iihf.models import Team, Match, MatchTip, Playoff, Special, SpecialTip
+from iihf.models import Team, Match, MatchTip, Playoff, Special, SpecialTip, Cup
 
 
 class Home(LoginRequiredMixin, TemplateView):
@@ -146,47 +146,37 @@ class MatchTipFormView(FormView):
 
 class SpecialTipFormView(FormView):
     template_name = 'iihf/form_special.html'
-    form_class = SpecialTipForm  # Set the form class here
+    form_class = SpecialTipForm
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()  # Instantiate the form
-        return render(request, self.template_name, {'form': form, 'year': kwargs.get('year')})
+        year = kwargs.get('year')
+        cup = get_object_or_404(Cup, year=year)
+        form = self.form_class(cup=cup)
+        return render(request, self.template_name, {'form': form, 'year': year})
 
     def post(self, request, *args, **kwargs):
-        form = SpecialTipForm(request.POST)
+        year = kwargs.get('year')
+        cup = get_object_or_404(Cup, year=year)
+        form = SpecialTipForm(request.POST, cup=cup)
         if form.is_valid():
-            # Check if the SpecialTip object exists for the current user
-            special_tip, created = SpecialTip.objects.get_or_create(user=request.user)
+            try:
+                # Get or create a SpecialTip object for the current user
+                special_tip, created = SpecialTip.objects.get_or_create(user=request.user, cup=cup)
 
-            # Update the existing object with the form data
-            special_tip.winner = form.cleaned_data['winner']
-            special_tip.final_a = form.cleaned_data['final_a']
-            special_tip.final_b = form.cleaned_data['final_b']
-            special_tip.bronze_a = form.cleaned_data['bronze_a']
-            special_tip.bronze_b = form.cleaned_data['bronze_b']
-            special_tip.czech_shooter_first = form.cleaned_data['czech_shooter_first']
-            special_tip.czech_shooter_last = form.cleaned_data['czech_shooter_last']
-            special_tip.max_goals_per_game = form.cleaned_data['max_goals_per_game']
-            special_tip.group_a_1 = form.cleaned_data['group_a_1']
-            special_tip.group_b_1 = form.cleaned_data['group_b_1']
-            special_tip.group_a_2 = form.cleaned_data['group_a_2']
-            special_tip.group_b_2 = form.cleaned_data['group_b_2']
-            special_tip.group_a_3 = form.cleaned_data['group_a_3']
-            special_tip.group_b_3 = form.cleaned_data['group_b_3']
-            special_tip.group_a_4 = form.cleaned_data['group_a_4']
-            special_tip.group_b_4 = form.cleaned_data['group_b_4']
-            special_tip.team_most_goals = form.cleaned_data['team_most_goals']
-            special_tip.team_least_goals = form.cleaned_data['team_least_goals']
-            special_tip.team_first_goal = form.cleaned_data['team_first_goal']
-            special_tip.team_last_goal = form.cleaned_data['team_last_goal']
-            special_tip.team_drop_a = form.cleaned_data['team_drop_a']
-            special_tip.team_drop_b = form.cleaned_data['team_drop_b']
-            special_tip.overtimes = form.cleaned_data['overtimes']
+                # Update the SpecialTip object with the form data
+                for field in form.cleaned_data:
+                    setattr(special_tip, field, form.cleaned_data[field])
 
-            # Save the changes
-            special_tip.save()
-            # Redirect to a success URL or any other page
-            return redirect('iihf-home', year=kwargs.get('year'))
+                # Save the changes
+                special_tip.save()
+
+                # Redirect to a success URL
+                return redirect('iihf-home', year=kwargs.get('year'))
+            except Exception as e:
+                # Handle any unexpected errors
+                print(f"Error saving SpecialTip: {e}")
+                # You can customize error handling here, such as displaying a message to the user
+                pass
         else:
-            # If the form is not valid, handle the error (redirect, display message, etc.)
-            pass  # Handle form errors here
+            # If the form is not valid, re-render the form with errors
+            return render(request, self.template_name, {'form': form, 'year': kwargs.get('year')})
