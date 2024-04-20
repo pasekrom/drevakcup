@@ -117,7 +117,17 @@ colgroup col.color5 {
                     <img src="{{ match.team_a.flag.url }}" class="team-flag"> {{ match.team_a.name }} - {{ match.team_b.name }} <img src="{{ match.team_b.flag.url }}" class="team-flag">
                   </th>
                   <td><small>{{ match.date|date:"j. E H:i" }}</small></td>
-                  <th>{% if match.score_a %}{{ match.score_a }}:{{ match.score_b }}{% endif %}</th>
+                  <th>
+                      {% if match.score_a != None and match.score_b != None %}
+                          {% if match.score_a != match.score_a_final or match.score_b != match.score_b_final %}
+                            {{ match.score_a_final }}:{{ match.score_b_final }}
+                          {% else %}
+                            {{ match.score_a }}:{{ match.score_b }}
+                          {% endif %}
+                          {% if match.overtime %}p{% endif %}
+                          {% if match.shootout %}sn{% endif %}
+                      {% endif %}
+                  </th>
                   {% for user in users %}
                     <td>
                       {% for match_tip in all_match_tips %}

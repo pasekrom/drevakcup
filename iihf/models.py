@@ -37,8 +37,10 @@ class Match(models.Model):
     team_b = models.ForeignKey(Team, related_name='matches_team_b', on_delete=models.CASCADE)
     score_a = models.IntegerField(blank=True, null=True)
     score_b = models.IntegerField(blank=True, null=True)
-    ot = models.CharField(max_length=1, blank=True)
-    so = models.CharField(max_length=1, blank=True)
+    score_a_final = models.IntegerField(blank=True, null=True)
+    score_b_final = models.IntegerField(blank=True, null=True)
+    overtime = models.BooleanField(default=False)
+    shootout = models.BooleanField(default=False)
     date = models.DateTimeField()
     cup = models.ForeignKey(Cup, on_delete=models.CASCADE)
 
