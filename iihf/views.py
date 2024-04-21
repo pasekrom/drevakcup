@@ -200,30 +200,46 @@ def calculate_points(request, cup_year):
     all_matches = Match.objects.filter(cup=cup)
     special = Special.objects.filter(cup=cup).first()
 
+    started = False
+
+    match_list = Match.objects.filter(cup=cup).order_by('date', 'team_a__group')
+
+    if match_list:
+        start_date = Match.objects.filter(cup=cup).order_by('date', 'team_a__group').values('date').first()
+        start_date = start_date['date']
+        start_date = start_date.astimezone(timezone.get_current_timezone())
+        start_date_formatted = start_date.strftime("%Y-%m-%d %H:%M:%S.%f")
+        current_date = str(datetime.now())
+        if current_date > start_date_formatted:
+            started = True
+        else:
+            started = False
+
     for user in users:
         user_point, created = UserPoint.objects.get_or_create(user=user, cup=cup, part='A')
         user_point.points = 0
 
-        for match in all_matches:
-            match_tips = MatchTip.objects.filter(match=match, user=user)
+        if started:
+            for match in all_matches:
+                match_tips = MatchTip.objects.filter(match=match, user=user)
 
-            for match_tip in match_tips:
-                if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b:
-                    user_point.points += 7
-                elif (match.score_a > match.score_b and match_tip.score_a > match_tip.score_b) or (
-                        match.score_a < match.score_b and match_tip.score_a < match_tip.score_b) or (
-                             match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
-                    user_point.points += 3
+                for match_tip in match_tips:
+                    if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b:
+                        user_point.points += 7
+                    elif (match.score_a > match.score_b and match_tip.score_a > match_tip.score_b) or (
+                            match.score_a < match.score_b and match_tip.score_a < match_tip.score_b) or (
+                                 match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
+                        user_point.points += 3
 
-                user_point.part = 'A'
-                user_point.save()
+                    user_point.part = 'A'
+                    user_point.save()
 
         user_point_b, created = UserPoint.objects.get_or_create(user=user, cup=cup, part='B')
         user_point_b.points = 0
 
         special_tips = SpecialTip.objects.filter(user=user, cup=cup).first()
 
-        if special_tips:
+        if special_tips and started:
 
             if special.winner == special_tips.winner:
                 user_point_b.points += 24
