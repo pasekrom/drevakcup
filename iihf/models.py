@@ -139,3 +139,13 @@ class SpecialTip(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+
+class UserPoint(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cup = models.ForeignKey(Cup, on_delete=models.CASCADE)
+    points = models.IntegerField(default=0)
+    part = models.CharField(max_length=1, default='A')
+
+    def __str__(self):
+        return f'{self.cup} - {self.user}'

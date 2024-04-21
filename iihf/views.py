@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, FormView
 
 from core.models import User
 from iihf.forms import MatchTipForm, SpecialTipForm
-from iihf.models import Team, Match, MatchTip, Playoff, Special, SpecialTip, Cup
+from iihf.models import Team, Match, MatchTip, Playoff, Special, SpecialTip, Cup, UserPoint
 
 
 class Home(LoginRequiredMixin, TemplateView):
@@ -16,6 +16,10 @@ class Home(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         year = kwargs.get('year')
+
+        # TADY POČÍTÁM
+        calculate_points(self.request, year)
+        # TADY KONČÍM POČÍTÁNÍ
 
         authenticated_user = self.request.user
         other_users = User.objects.exclude(pk=authenticated_user.pk).order_by('name')
@@ -40,6 +44,10 @@ class Home(LoginRequiredMixin, TemplateView):
 
         special_tips = SpecialTip.objects.filter(cup__year=year)
 
+        user_points_a = UserPoint.objects.filter(cup__year=year, part='A')
+        user_points_b = UserPoint.objects.filter(cup__year=year, part='B')
+        user_points_c = UserPoint.objects.filter(cup__year=year, part='C')
+
         context['year'] = year
         context['users'] = users
         context['match_list'] = match_list
@@ -47,6 +55,9 @@ class Home(LoginRequiredMixin, TemplateView):
         context['started'] = started
         context['special'] = special
         context['special_tips'] = special_tips
+        context['user_points_a'] = user_points_a
+        context['user_points_b'] = user_points_b
+        context['user_points_c'] = user_points_c
         return context
 
 
@@ -180,3 +191,94 @@ class SpecialTipFormView(FormView):
         else:
             # If the form is not valid, re-render the form with errors
             return render(request, self.template_name, {'form': form, 'year': kwargs.get('year')})
+
+
+def calculate_points(request, cup_year):
+    cup = Cup.objects.get(year=cup_year)
+
+    users = User.objects.all()
+    all_matches = Match.objects.filter(cup=cup)
+    special = Special.objects.filter(cup=cup).first()
+
+    for user in users:
+        user_point, created = UserPoint.objects.get_or_create(user=user, cup=cup, part='A')
+        user_point.points = 0
+
+        for match in all_matches:
+            match_tips = MatchTip.objects.filter(match=match, user=user)
+
+            for match_tip in match_tips:
+                if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b:
+                    user_point.points += 7
+                elif (match.score_a > match.score_b and match_tip.score_a > match_tip.score_b) or (
+                        match.score_a < match.score_b and match_tip.score_a < match_tip.score_b) or (
+                             match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
+                    user_point.points += 3
+
+                user_point.part = 'A'
+                user_point.save()
+
+        user_point_b, created = UserPoint.objects.get_or_create(user=user, cup=cup, part='B')
+        user_point_b.points = 0
+
+        special_tips = SpecialTip.objects.filter(user=user, cup=cup).first()
+
+        if special_tips:
+
+            if special.winner == special_tips.winner:
+                user_point_b.points += 24
+            if special.final_a == special_tips.final_a:
+                user_point_b.points += 16
+            if special.final_b == special_tips.final_b:
+                user_point_b.points += 16
+            if special.bronze_a == special_tips.bronze_a:
+                user_point_b.points += 12
+            if special.bronze_b == special_tips.bronze_b:
+                user_point_b.points += 12
+            if special.czech_shooter_first == special_tips.czech_shooter_first:
+                user_point_b.points += 12
+            if special.czech_shooter_last == special_tips.czech_shooter_last:
+                user_point_b.points += 12
+            if special.max_goals_per_game == special_tips.max_goals_per_game:
+                user_point_b.points += 12
+            if special.group_a_1 == special_tips.group_a_1:
+                user_point_b.points += 9
+            if special.group_b_1 == special_tips.group_b_1:
+                user_point_b.points += 9
+            if special.group_a_2 == special_tips.group_a_2:
+                user_point_b.points += 6
+            if special.group_b_2 == special_tips.group_b_2:
+                user_point_b.points += 6
+            if special.group_a_3 == special_tips.group_a_3:
+                user_point_b.points += 6
+            if special.group_b_3 == special_tips.group_b_3:
+                user_point_b.points += 6
+            if special.group_a_4 == special_tips.group_a_4:
+                user_point_b.points += 6
+            if special.group_b_4 == special_tips.group_b_4:
+                user_point_b.points += 6
+            if special.team_most_goals == special_tips.team_most_goals:
+                user_point_b.points += 12
+            if special.team_least_goals == special_tips.team_least_goals:
+                user_point_b.points += 12
+            if special.team_first_goal == special_tips.team_first_goal:
+                user_point_b.points += 3
+            if special.team_last_goal == special_tips.team_last_goal:
+                user_point_b.points += 12
+            if special.team_drop_a == special_tips.team_drop_a:
+                user_point_b.points += 6
+            if special.team_drop_b == special_tips.team_drop_b:
+                user_point_b.points += 6
+            if special.overtimes == special_tips.overtimes:
+                user_point_b.points += 24
+
+        user_point_b.part = 'B'
+        user_point_b.save()
+
+        user_point_c, created = UserPoint.objects.get_or_create(user=user, cup=cup, part='C')
+        user_point_c.points = user_point.points + user_point_b.points
+
+        user_point_c.part = 'C'
+        user_point_c.save()
+
+    return redirect('home')
