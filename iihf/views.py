@@ -17,9 +17,7 @@ class Home(LoginRequiredMixin, TemplateView):
 
         year = kwargs.get('year')
 
-        # TADY POČÍTÁM
         calculate_points(self.request, year)
-        # TADY KONČÍM POČÍTÁNÍ
 
         authenticated_user = self.request.user
         other_users = User.objects.exclude(pk=authenticated_user.pk).order_by('name')
@@ -40,7 +38,7 @@ class Home(LoginRequiredMixin, TemplateView):
                 started = True
             else:
                 started = False
-        all_match_tips = MatchTip.objects.all()
+        all_match_tips = MatchTip.objects.filter(match__cup__year=year)
 
         special_tips = SpecialTip.objects.filter(cup__year=year)
 
@@ -224,12 +222,13 @@ def calculate_points(request, cup_year):
                 match_tips = MatchTip.objects.filter(match=match, user=user)
 
                 for match_tip in match_tips:
-                    if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b:
-                        user_point.points += 7
-                    elif (match.score_a > match.score_b and match_tip.score_a > match_tip.score_b) or (
-                            match.score_a < match.score_b and match_tip.score_a < match_tip.score_b) or (
-                                 match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
-                        user_point.points += 3
+                    if match.score_a and match.score_b:
+                        if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b:
+                            user_point.points += 7
+                        elif (match.score_a > match.score_b and match_tip.score_a > match_tip.score_b) or (
+                                match.score_a < match.score_b and match_tip.score_a < match_tip.score_b) or (
+                                     match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
+                            user_point.points += 3
 
                     user_point.part = 'A'
                     user_point.save()
@@ -239,7 +238,7 @@ def calculate_points(request, cup_year):
 
         special_tips = SpecialTip.objects.filter(user=user, cup=cup).first()
 
-        if special_tips and started:
+        if special_tips and special and started:
 
             if special.winner == special_tips.winner:
                 user_point_b.points += 24
