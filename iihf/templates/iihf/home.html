@@ -248,7 +248,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.winner.name }}
+                                {% if tip.winner.name == special.winner.name %}<b>{{ tip.winner.name }}</b>
+                                {% else %}{{ tip.winner.name }}{% endif %}
                             {% elif tip.winner %}
                             ???
                             {% endif %}
@@ -266,7 +267,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.final_a.name }}
+                                {% if tip.final_a.name == special.final_a.name or tip.final_a.name == special.final_b.name %}<b>{{ tip.final_a.name }}</b>
+                                {% else %}{{ tip.final_a.name }}{% endif %}
                             {% elif tip.final_a %}
                             ???
                             {% endif %}
@@ -284,7 +286,10 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.final_b.name }}
+                                {% if tip.final_a.name != tip.final_b.name %}
+                                    {% if tip.final_b.name == special.final_b.name or tip.final_b.name == special.final_a.name %}<b>{{ tip.final_b.name }}</b>
+                                    {% else %}{{ tip.final_b.name }}{% endif %}
+                                {% else %}{{ tip.final_b.name }}{% endif %}
                             {% elif tip.final_b %}
                             ???
                             {% endif %}
@@ -302,7 +307,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.bronze_a.name }}
+                                {% if tip.bronze_a.name == special.bronze_a.name or tip.bronze_a.name == special.bronze_b.name %}<b>{{ tip.bronze_a.name }}</b>
+                                {% else %}{{ tip.bronze_a.name }}{% endif %}
                             {% elif tip.bronze_a %}
                             ???
                             {% endif %}
@@ -320,7 +326,10 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.bronze_b.name }}
+                                {% if tip.bronze_a.name != tip.bronze_b.name %}
+                                    {% if tip.bronze_b.name == special.bronze_b.name or tip.bronze_b.name == special.bronze_a.name %}<b>{{ tip.bronze_b.name }}</b>
+                                    {% else %}{{ tip.bronze_b.name }}{% endif %}
+                                {% else %}{{ tip.bronze_b.name }}{% endif %}
                             {% elif tip.bronze_b %}
                             ???
                             {% endif %}
@@ -338,7 +347,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.czech_shooter_first }}
+                                {% if tip.czech_shooter_first == special.czech_shooter_first %}<b>{{ tip.czech_shooter_first }}</b>
+                                {% else %}{{ tip.czech_shooter_first }}{% endif %}
                             {% elif tip.czech_shooter_first %}
                             ???
                             {% endif %}
@@ -356,7 +366,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.czech_shooter_last }}
+                                {% if tip.czech_shooter_last == special.czech_shooter_last %}<b>{{ tip.czech_shooter_last }}</b>
+                                {% else %}{{ tip.czech_shooter_last }}{% endif %}
                             {% elif tip.czech_shooter_last %}
                             ???
                             {% endif %}
@@ -374,7 +385,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.max_goals_per_game }}
+                                {% if tip.max_goals_per_game == special.max_goals_per_game %}<b>{{ tip.max_goals_per_game }}</b>
+                                {% else %}{{ tip.max_goals_per_game }}{% endif %}
                             {% elif tip.max_goals_per_game %}
                             ???
                             {% endif %}
@@ -392,7 +404,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_a_1.name }}
+                                {% if tip.group_a_1.name == special.group_a_1.name %}<b>{{ tip.group_a_1.name }}</b>
+                                {% else %}{{ tip.group_a_1.name }}{% endif %}
                             {% elif tip.group_a_1 %}
                             ???
                             {% endif %}
@@ -410,7 +423,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_b_1.name }}
+                                {% if tip.group_b_1.name == special.group_b_1.name %}<b>{{ tip.group_b_1.name }}</b>
+                                {% else %}{{ tip.group_b_1.name }}{% endif %}
                             {% elif tip.group_b_1 %}
                             ???
                             {% endif %}
@@ -428,7 +442,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_a_2.name }}
+                                {% if tip.group_a_2.name == special.group_a_2.name %}<b>{{ tip.group_a_2.name }}</b>
+                                {% else %}{{ tip.group_a_2.name }}{% endif %}
                             {% elif tip.group_a_2 %}
                             ???
                             {% endif %}
@@ -446,7 +461,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_b_2.name }}
+                                {% if tip.group_b_2.name == special.group_b_2.name %}<b>{{ tip.group_b_2.name }}</b>
+                                {% else %}{{ tip.group_b_2.name }}{% endif %}
                             {% elif tip.group_b_2 %}
                             ???
                             {% endif %}
@@ -464,7 +480,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_a_3.name }}
+                                {% if tip.group_a_3.name == special.group_a_3.name %}<b>{{ tip.group_a_3.name }}</b>
+                                {% else %}{{ tip.group_a_3.name }}{% endif %}
                             {% elif tip.group_a_3 %}
                             ???
                             {% endif %}
@@ -482,7 +499,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_b_3.name }}
+                                {% if tip.group_b_3.name == special.group_b_3.name %}<b>{{ tip.group_b_3.name }}</b>
+                                {% else %}{{ tip.group_b_3.name }}{% endif %}
                             {% elif tip.group_b_3 %}
                             ???
                             {% endif %}
@@ -500,7 +518,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_a_4.name }}
+                                {% if tip.group_a_4.name == special.group_a_4.name %}<b>{{ tip.group_a_4.name }}</b>
+                                {% else %}{{ tip.group_a_4.name }}{% endif %}
                             {% elif tip.group_a_4 %}
                             ???
                             {% endif %}
@@ -518,7 +537,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.group_b_4.name }}
+                                {% if tip.group_b_4.name == special.group_b_4.name %}<b>{{ tip.group_b_4.name }}</b>
+                                {% else %}{{ tip.group_b_4.name }}{% endif %}
                             {% elif tip.group_b_4 %}
                             ???
                             {% endif %}
@@ -536,7 +556,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.team_most_goals.name }}
+                                {% if tip.team_most_goals.name == special.team_most_goals.name %}<b>{{ tip.team_most_goals.name }}</b>
+                                {% else %}{{ tip.team_most_goals.name }}{% endif %}
                             {% elif tip.team_most_goals %}
                             ???
                             {% endif %}
@@ -554,7 +575,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.team_least_goals.name }}
+                                {% if tip.team_least_goals.name == special.team_least_goals.name %}<b>{{ tip.team_least_goals.name }}</b>
+                                {% else %}{{ tip.team_least_goals.name }}{% endif %}
                             {% elif tip.team_least_goals %}
                             ???
                             {% endif %}
@@ -572,7 +594,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.team_first_goal.name }}
+                                {% if tip.team_first_goal.name == special.team_first_goal.name %}<b>{{ tip.team_first_goal.name }}</b>
+                                {% else %}{{ tip.team_first_goal.name }}{% endif %}
                             {% elif tip.team_first_goal %}
                             ???
                             {% endif %}
@@ -590,7 +613,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.team_last_goal.name }}
+                                {% if tip.team_last_goal.name == special.team_last_goal.name %}<b>{{ tip.team_last_goal.name }}</b>
+                                {% else %}{{ tip.team_last_goal.name }}{% endif %}
                             {% elif tip.team_last_goal %}
                             ???
                             {% endif %}
@@ -608,7 +632,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.team_drop_a.name }}
+                                {% if tip.team_drop_a.name == special.team_drop_a.name %}<b>{{ tip.team_drop_a.name }}</b>
+                                {% else %}{{ tip.team_drop_a.name }}{% endif %}
                             {% elif tip.team_drop_a %}
                             ???
                             {% endif %}
@@ -626,7 +651,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.team_drop_b.name }}
+                                {% if tip.team_drop_b.name == special.team_drop_b.name %}<b>{{ tip.team_drop_b.name }}</b>
+                                {% else %}{{ tip.team_drop_b.name }}{% endif %}
                             {% elif tip.team_drop_b %}
                             ???
                             {% endif %}
@@ -644,7 +670,8 @@ colgroup col.color5 {
                         {% for tip in special_tips %}
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
-                                {{ tip.overtimes }}
+                                {% if tip.overtimes == special.overtimes %}<b>{{ tip.overtimes }}</b>
+                                {% else %}{{ tip.overtimes }}{% endif %}
                             {% elif tip.overtimes %}
                             ???
                             {% endif %}

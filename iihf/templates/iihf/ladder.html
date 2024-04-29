@@ -1,6 +1,7 @@
 {% extends 'core/base/base.html' %}
 {% load static %}
 {% block content %}
+
 <div class="container">
     <div class="text-center mt-5">
         <h1 class="mb-5">Žebříček</h1>
@@ -15,43 +16,38 @@
             </tr>
           </thead>
           <tbody>
+            {% for user in users %}
             <tr>
-              <th scope="row">1</th>
-              <td>Chose</td>
-              <td>143</td>
-              <td>109</td>
-              <th>252</th>
+              <th scope="row">
+                {{ forloop.counter }}
+              </th>
+              <td>{{ user.name }}</td>
+              <td>
+              {% for points in user_points_a %}
+                {% if points.user == user %}
+                    {{ points.points }}
+                {% endif %}
+              {% endfor %}
+              </td>
+              <td>
+              {% for points in user_points_b %}
+                {% if points.user == user %}
+                    {{ points.points }}
+                {% endif %}
+              {% endfor %}
+              </td>
+              <th>
+              {% for points in user_points_c %}
+                {% if points.user == user %}
+                    {{ points.points }}
+                {% endif %}
+              {% endfor %}
+              </th>
             </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Kipin</td>
-              <td>138</td>
-              <td>100</td>
-              <th>238</th>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Alda</td>
-              <td>141</td>
-              <td>88</td>
-              <th>229</th>
-            </tr>
-            <tr>
-              <th scope="row">4</th>
-              <td>Dřevák</td>
-              <td>128</td>
-              <td>88</td>
-              <th>216</th>
-            </tr>
-            <tr>
-              <th scope="row">5</th>
-              <td>Dejvák</td>
-              <td>133</td>
-              <td>55</td>
-              <th>188</th>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
     </div>
 </div>
+
 {% endblock content %}

@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum, Q
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView, FormView
@@ -85,7 +86,25 @@ class Ladder(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        year = kwargs.get('year')
+
+        calculate_points(self.request, year)
+
+        # Get all users annotated with the sum of points in user_points_c
+        users = User.objects.annotate(
+            total_points_c=Sum('userpoint__points', filter=Q(userpoint__cup__year=year, userpoint__part='C'))
+        ).order_by('-total_points_c')  # Order by total points in user_points_c in descending order
+
+        user_points_a = UserPoint.objects.filter(cup__year=year, part='A')
+        user_points_b = UserPoint.objects.filter(cup__year=year, part='B')
+        user_points_c = UserPoint.objects.filter(cup__year=year, part='C')
+
         context['year'] = kwargs.get('year')
+        context['users'] = users
+        context['user_points_a'] = user_points_a
+        context['user_points_b'] = user_points_b
+        context['user_points_c'] = user_points_c
         return context
 
 
@@ -242,13 +261,13 @@ def calculate_points(request, cup_year):
 
             if special.winner == special_tips.winner:
                 user_point_b.points += 24
-            if special.final_a == special_tips.final_a:
+            if special.final_a == special_tips.final_a or special.final_a == special_tips.final_b:
                 user_point_b.points += 16
-            if special.final_b == special_tips.final_b:
+            if special.final_b == special_tips.final_b or special.final_b == special_tips.final_a and special_tips.final_a != special_tips.final_b:
                 user_point_b.points += 16
-            if special.bronze_a == special_tips.bronze_a:
+            if special.bronze_a == special_tips.bronze_a or special.bronze_a == special_tips.bronze_b:
                 user_point_b.points += 12
-            if special.bronze_b == special_tips.bronze_b:
+            if special.bronze_b == special_tips.bronze_b or special.bronze_b == special_tips.bronze_a and special_tips.bronze_a != special_tips.bronze_b:
                 user_point_b.points += 12
             if special.czech_shooter_first == special_tips.czech_shooter_first:
                 user_point_b.points += 12
