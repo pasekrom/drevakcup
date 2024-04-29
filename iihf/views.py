@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Exists, OuterRef
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView, FormView
@@ -21,7 +21,22 @@ class Home(LoginRequiredMixin, TemplateView):
         calculate_points(self.request, year)
 
         authenticated_user = self.request.user
-        other_users = User.objects.exclude(pk=authenticated_user.pk).order_by('name')
+        #other_users = User.objects.exclude(pk=authenticated_user.pk).exclude(is_active=False).order_by('name')
+
+        other_users = User.objects.exclude(
+            pk=authenticated_user.pk
+        ).annotate(
+            has_match_tip=Exists(
+                MatchTip.objects.filter(
+                    user=OuterRef('pk'),
+                    match__cup__year=year
+                )
+            )
+        ).filter(
+            has_match_tip=True,
+            is_active=True
+        ).order_by('name')
+
         users = [authenticated_user] + list(other_users)
 
         match_list = Match.objects.filter(cup__year=year).order_by('date', 'team_a__group')
@@ -91,10 +106,18 @@ class Ladder(LoginRequiredMixin, TemplateView):
 
         calculate_points(self.request, year)
 
-        # Get all users annotated with the sum of points in user_points_c
         users = User.objects.annotate(
-            total_points_c=Sum('userpoint__points', filter=Q(userpoint__cup__year=year, userpoint__part='C'))
-        ).order_by('-total_points_c')  # Order by total points in user_points_c in descending order
+            total_points_c=Sum('userpoint__points', filter=Q(userpoint__cup__year=year, userpoint__part='C')),
+            has_match_tip=Exists(
+                MatchTip.objects.filter(
+                    user=OuterRef('pk'),
+                    match__cup__year=year
+                )
+            )
+        ).filter(
+            is_active=True,
+            has_match_tip=True
+        ).order_by('-total_points_c')
 
         user_points_a = UserPoint.objects.filter(cup__year=year, part='A')
         user_points_b = UserPoint.objects.filter(cup__year=year, part='B')
