@@ -180,7 +180,7 @@ colgroup col.color15 {
                             {% elif match.score_a < match.score_b and match_tip.score_a < match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
                             {% elif match.score_a == match.score_b and match_tip.score_a == match_tip.score_b %}<b>{{ match_tip.score_a }}:{{ match_tip.score_b }}</b>
                             {% else %}
-                            {{ match_tip.score_a }}:{{ match_tip.score_b }}{% endif %}
+                            <del>{{ match_tip.score_a }}:{{ match_tip.score_b }}</del>{% endif %}
                           {% else %}
                             <i>{{ match_tip.score_a }}:{{ match_tip.score_b }}</i>
                           {% endif %}
