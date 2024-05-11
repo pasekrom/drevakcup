@@ -18,10 +18,10 @@ class Home(LoginRequiredMixin, TemplateView):
 
         year = kwargs.get('year')
 
-        calculate_points(self.request, year)
+        # calculate_points(self.request, year)
 
         authenticated_user = self.request.user
-        #other_users = User.objects.exclude(pk=authenticated_user.pk).exclude(is_active=False).order_by('name')
+        # other_users = User.objects.exclude(pk=authenticated_user.pk).exclude(is_active=False).order_by('name')
 
         other_users = User.objects.exclude(
             pk=authenticated_user.pk
@@ -104,7 +104,7 @@ class Ladder(LoginRequiredMixin, TemplateView):
 
         year = kwargs.get('year')
 
-        calculate_points(self.request, year)
+        # calculate_points(self.request, year)
 
         users = User.objects.annotate(
             total_points_c=Sum('userpoint__points', filter=Q(userpoint__cup__year=year, userpoint__part='C')),
@@ -233,8 +233,8 @@ class SpecialTipFormView(FormView):
             return render(request, self.template_name, {'form': form, 'year': kwargs.get('year')})
 
 
-def calculate_points(request, cup_year):
-    cup = Cup.objects.get(year=cup_year)
+def calculate_points(request, year):
+    cup = Cup.objects.get(year=year)
 
     users = User.objects.all()
     all_matches = Match.objects.filter(cup=cup)

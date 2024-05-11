@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, Rules, Ladder, Teams, MatchTipFormView, SpecialTipFormView
+from .views import Home, Rules, Ladder, Teams, MatchTipFormView, SpecialTipFormView, calculate_points
 
 urlpatterns = [
     path('<int:year>/home/', Home.as_view(), name='iihf-home'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:year>/rules/', Rules.as_view(), name='iihf-rules'),
     path('<int:year>/match_tip/', MatchTipFormView.as_view(), name='iihf-match-tip'),
     path('<int:year>/special_tip/', SpecialTipFormView.as_view(), name='iihf-special-tip'),
+    path('<int:year>/calculate/', calculate_points, name='iihf-calculate'),
 ]

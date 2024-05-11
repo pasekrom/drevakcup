@@ -20,30 +20,86 @@
     margin-right: 5px;
 }
 
+/* Red */
 colgroup col.color1 {
-  background-color: rgba(255, 0, 0, 0.05); /* Red */
+  background-color: rgba(255, 0, 0, 0.05);
 }
 
+/* Blue */
 colgroup col.color2 {
-  background-color: rgba(0, 0, 255, 0.05); /* Blue */
+  background-color: rgba(0, 0, 255, 0.05);
 }
 
+/* Green */
 colgroup col.color3 {
-  background-color: rgba(0, 255, 0, 0.05); /* Green */
+  background-color: rgba(0, 255, 0, 0.05);
 }
 
+/* Purple */
 colgroup col.color4 {
-  background-color: rgba(128, 0, 128, 0.05); /* Purple */
+  background-color: rgba(128, 0, 128, 0.05);
 }
 
+/* Yellow */
 colgroup col.color5 {
-  background-color: rgba(255, 255, 0, 0.05); /* Yellow */
+  background-color: rgba(255, 255, 0, 0.05);
 }
+
+/* Orange */
+colgroup col.color6 {
+  background-color: rgba(255, 165, 0, 0.05);
+}
+
+/* Cyan */
+colgroup col.color7 {
+  background-color: rgba(0, 255, 255, 0.05);
+}
+
+/* Magenta */
+colgroup col.color8 {
+  background-color: rgba(255, 0, 255, 0.05);
+}
+
+/* Lime */
+colgroup col.color9 {
+  background-color: rgba(0, 255, 0, 0.05);
+}
+
+/* Pink */
+colgroup col.color10 {
+  background-color: rgba(255, 192, 203, 0.05);
+}
+
+/* Teal */
+colgroup col.color11 {
+  background-color: rgba(0, 128, 128, 0.05);
+}
+
+/* Lavender */
+colgroup col.color12 {
+  background-color: rgba(230, 230, 250, 0.05);
+}
+
+/* Brown */
+colgroup col.color13 {
+  background-color: rgba(165, 42, 42, 0.05);
+}
+
+/* Gold */
+colgroup col.color14 {
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+/* Silver */
+colgroup col.color15 {
+  background-color: rgba(192, 192, 192, 0.05);
+}
+
 </style>
 
 <div class="container">
 
-
+{% if request.user.is_staff %}<h1 class="text-center mb-5"><a class="btn btn-danger" href="{% url 'iihf-calculate' year=year %}">Přepočítat body</a></h1>{% endif %}
 
     <div class="text-center mt-5">
         <h1 class="mb-5">1. část {% if not started %}<a class="btn btn-success" href="{% url 'iihf-match-tip' year=year %}">Vyplnit svoje tipy</a>{% endif %}</h1>
@@ -58,46 +114,31 @@ colgroup col.color5 {
                     <col span="1" class="color3">
                     <col span="1" class="color4">
                     <col span="1" class="color5">
+                    <col span="1" class="color6">
+                    <col span="1" class="color7">
+                    <col span="1" class="color8">
+                    <col span="1" class="color9">
+                    <col span="1" class="color10">
+                    <col span="1" class="color11">
+                    <col span="1" class="color12">
+                    <col span="1" class="color13">
+                    <col span="1" class="color14">
+                    <col span="1" class="color15">
                     <col span="1" class="color1">
                     <col span="1" class="color2">
                     <col span="1" class="color3">
                     <col span="1" class="color4">
                     <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
+                    <col span="1" class="color6">
+                    <col span="1" class="color7">
+                    <col span="1" class="color8">
+                    <col span="1" class="color9">
+                    <col span="1" class="color10">
+                    <col span="1" class="color11">
+                    <col span="1" class="color12">
+                    <col span="1" class="color13">
+                    <col span="1" class="color14">
+                    <col span="1" class="color15">
                 </colgroup>
               <thead>
                 <tr>
@@ -187,46 +228,31 @@ colgroup col.color5 {
                     <col span="1" class="color3">
                     <col span="1" class="color4">
                     <col span="1" class="color5">
+                    <col span="1" class="color6">
+                    <col span="1" class="color7">
+                    <col span="1" class="color8">
+                    <col span="1" class="color9">
+                    <col span="1" class="color10">
+                    <col span="1" class="color11">
+                    <col span="1" class="color12">
+                    <col span="1" class="color13">
+                    <col span="1" class="color14">
+                    <col span="1" class="color15">
                     <col span="1" class="color1">
                     <col span="1" class="color2">
                     <col span="1" class="color3">
                     <col span="1" class="color4">
                     <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
+                    <col span="1" class="color6">
+                    <col span="1" class="color7">
+                    <col span="1" class="color8">
+                    <col span="1" class="color9">
+                    <col span="1" class="color10">
+                    <col span="1" class="color11">
+                    <col span="1" class="color12">
+                    <col span="1" class="color13">
+                    <col span="1" class="color14">
+                    <col span="1" class="color15">
                 </colgroup>
               <thead>
                 <tr>
@@ -386,6 +412,7 @@ colgroup col.color5 {
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
                                 {% if tip.max_goals_per_game == special.max_goals_per_game %}<b>{{ tip.max_goals_per_game }}</b>
+                                {% elif tip.max_goals_per_game < special.max_goals_per_game %}<del>{{ tip.max_goals_per_game }}</del>
                                 {% else %}{{ tip.max_goals_per_game }}{% endif %}
                             {% elif tip.max_goals_per_game %}
                             ???
@@ -671,6 +698,7 @@ colgroup col.color5 {
                         {% if tip.user == user %}
                             {% if request.user == user or started %}
                                 {% if tip.overtimes == special.overtimes %}<b>{{ tip.overtimes }}</b>
+                                {% elif tip.overtimes < special.overtimes %}<del>{{ tip.overtimes }}</del>
                                 {% else %}{{ tip.overtimes }}{% endif %}
                             {% elif tip.overtimes %}
                             ???
@@ -712,46 +740,31 @@ colgroup col.color5 {
                     <col span="1" class="color3">
                     <col span="1" class="color4">
                     <col span="1" class="color5">
+                    <col span="1" class="color6">
+                    <col span="1" class="color7">
+                    <col span="1" class="color8">
+                    <col span="1" class="color9">
+                    <col span="1" class="color10">
+                    <col span="1" class="color11">
+                    <col span="1" class="color12">
+                    <col span="1" class="color13">
+                    <col span="1" class="color14">
+                    <col span="1" class="color15">
                     <col span="1" class="color1">
                     <col span="1" class="color2">
                     <col span="1" class="color3">
                     <col span="1" class="color4">
                     <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
-                    <col span="1" class="color1">
-                    <col span="1" class="color2">
-                    <col span="1" class="color3">
-                    <col span="1" class="color4">
-                    <col span="1" class="color5">
+                    <col span="1" class="color6">
+                    <col span="1" class="color7">
+                    <col span="1" class="color8">
+                    <col span="1" class="color9">
+                    <col span="1" class="color10">
+                    <col span="1" class="color11">
+                    <col span="1" class="color12">
+                    <col span="1" class="color13">
+                    <col span="1" class="color14">
+                    <col span="1" class="color15">
                 </colgroup>
               <thead>
                 <tr>
