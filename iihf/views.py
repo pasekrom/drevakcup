@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, Q, Exists, OuterRef
+from django.db.models import Sum, Q, Exists, OuterRef, F
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView, FormView
@@ -233,8 +233,23 @@ class SpecialTipFormView(FormView):
             return render(request, self.template_name, {'form': form, 'year': kwargs.get('year')})
 
 
+def reset_team_statistics():
+    # Reset team statistics
+    Team.objects.update(
+        gp=0,
+        win=0,
+        los=0,
+        wot=0,
+        lot=0,
+        gf=0,
+        ga=0,
+        points=0
+    )
+
+
 def calculate_points(request, year):
     cup = Cup.objects.get(year=year)
+    reset_team_statistics()
 
     users = User.objects.all()
     all_matches = Match.objects.filter(cup=cup)
@@ -255,6 +270,45 @@ def calculate_points(request, year):
         else:
             started = False
 
+    for match in all_matches:
+        # Fetch team instances separately for each team in the match
+        team_a = Team.objects.get(name=match.team_a.name, year=cup.year)
+        team_b = Team.objects.get(name=match.team_b.name, year=cup.year)
+
+        # Increment games played count for each team
+        if match.score_a_final is not None and match.score_b_final is not None:
+            team_a.gp += 1
+            team_b.gp += 1
+
+            # Update other team statistics based on match result
+            if match.score_a > match.score_b:
+                team_a.win += 1
+                team_b.los += 1
+                team_a.points += 3
+            elif match.score_a < match.score_b:
+                team_b.win += 1
+                team_a.los += 1
+                team_b.points += 3
+            elif match.score_a_final > match.score_b_final:
+                team_a.wot += 1
+                team_b.lot += 1
+                team_a.points += 2
+                team_b.points += 1
+            elif match.score_a_final < match.score_b_final:
+                team_b.wot += 1
+                team_a.lot += 1
+                team_b.points += 2
+                team_a.points += 1
+
+            team_a.gf += match.score_a_final
+            team_a.ga += match.score_b_final
+            team_b.gf += match.score_b_final
+            team_b.ga += match.score_a_final
+
+            # Save the updated team statistics
+            team_a.save()
+            team_b.save()
+
     for user in users:
         user_point, created = UserPoint.objects.get_or_create(user=user, cup=cup, part='A')
         user_point.points = 0
@@ -264,12 +318,12 @@ def calculate_points(request, year):
                 match_tips = MatchTip.objects.filter(match=match, user=user)
 
                 for match_tip in match_tips:
-                    if match.score_a and match.score_b:
+                    if match.score_a is not None and match.score_b is not None:
                         if match_tip.score_a == match.score_a and match_tip.score_b == match.score_b:
                             user_point.points += 7
                         elif (match.score_a > match.score_b and match_tip.score_a > match_tip.score_b) or (
                                 match.score_a < match.score_b and match_tip.score_a < match_tip.score_b) or (
-                                     match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
+                                match.score_a == match.score_b and match_tip.score_a == match_tip.score_b):
                             user_point.points += 3
 
                     user_point.part = 'A'
