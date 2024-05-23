@@ -320,26 +320,6 @@ def calculate_points(request, year):
             team_a.gp += 1
             team_b.gp += 1
 
-            # Update other team statistics based on match result
-            if match.score_a > match.score_b:
-                team_a.win += 1
-                team_b.los += 1
-                team_a.points += 3
-            elif match.score_a < match.score_b:
-                team_b.win += 1
-                team_a.los += 1
-                team_b.points += 3
-            elif match.score_a_final > match.score_b_final:
-                team_a.wot += 1
-                team_b.lot += 1
-                team_a.points += 2
-                team_b.points += 1
-            elif match.score_a_final < match.score_b_final:
-                team_b.wot += 1
-                team_a.lot += 1
-                team_b.points += 2
-                team_a.points += 1
-
             team_a.gf += match.score_a_final
             team_a.ga += match.score_b_final
             team_b.gf += match.score_b_final

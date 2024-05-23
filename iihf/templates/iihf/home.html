@@ -197,6 +197,14 @@ colgroup col.color15 {
               </tbody>
               <tfoot>
                 <tr>
+                  <th scope="col">Hra</th>
+                  <th scope="col">Datum</th>
+                  <th scope="col">Výsledek</th>
+                  {% for user in users %}
+                    <th scope="col">{{ user.name }}</th>
+                  {% endfor %}
+                </tr>
+                <tr>
                   <th scope="col">Celkem</th>
                   <td></td>
                   <td></td>
@@ -710,6 +718,14 @@ colgroup col.color15 {
                 </tr>
               </tbody>
               <tfoot>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Bodů</th>
+                  <th scope="col">Výsledek</th>
+                  {% for user in users %}
+                    <th scope="col">{{ user.name }}</th>
+                  {% endfor %}
+                </tr>
                 <tr>
                   <th scope="col">Celkem</th>
                   <td></td>
