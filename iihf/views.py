@@ -253,6 +253,7 @@ def calculate_points(request, year):
 
     users = User.objects.all()
     all_matches = Match.objects.filter(cup=cup)
+    playoffs = Playoff.objects.filter(cup=cup)
     special = Special.objects.filter(cup=cup).first()
 
     started = False
@@ -271,6 +272,45 @@ def calculate_points(request, year):
             started = False
 
     for match in all_matches:
+        # Fetch team instances separately for each team in the match
+        team_a = Team.objects.get(name=match.team_a.name, year=cup.year)
+        team_b = Team.objects.get(name=match.team_b.name, year=cup.year)
+
+        # Increment games played count for each team
+        if match.score_a_final is not None and match.score_b_final is not None:
+            team_a.gp += 1
+            team_b.gp += 1
+
+            # Update other team statistics based on match result
+            if match.score_a > match.score_b:
+                team_a.win += 1
+                team_b.los += 1
+                team_a.points += 3
+            elif match.score_a < match.score_b:
+                team_b.win += 1
+                team_a.los += 1
+                team_b.points += 3
+            elif match.score_a_final > match.score_b_final:
+                team_a.wot += 1
+                team_b.lot += 1
+                team_a.points += 2
+                team_b.points += 1
+            elif match.score_a_final < match.score_b_final:
+                team_b.wot += 1
+                team_a.lot += 1
+                team_b.points += 2
+                team_a.points += 1
+
+            team_a.gf += match.score_a_final
+            team_a.ga += match.score_b_final
+            team_b.gf += match.score_b_final
+            team_b.ga += match.score_a_final
+
+            # Save the updated team statistics
+            team_a.save()
+            team_b.save()
+
+    for match in playoffs:
         # Fetch team instances separately for each team in the match
         team_a = Team.objects.get(name=match.team_a.name, year=cup.year)
         team_b = Team.objects.get(name=match.team_b.name, year=cup.year)
