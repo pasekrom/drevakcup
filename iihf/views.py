@@ -358,23 +358,33 @@ def calculate_points(request, year):
 
             if special.winner == special_tips.winner:
                 user_point_b.points += 24
-            # Check for final_a matches and add points
+                
+            matched_conditions = set()
+
+            # Check for final_a matches and add points if not already matched
             if special.final_a == special_tips.final_a or special.final_a == special_tips.final_b:
-                user_point_b.points += 16
+                if 'final_a' not in matched_conditions:
+                    user_point_b.points += 16
+                    matched_conditions.add('final_a')
 
-            # Check for final_b matches and add points, ensuring correct logic with parentheses
-            if (
-                    special.final_b == special_tips.final_b or special.final_b == special_tips.final_a) and special_tips.final_a != special_tips.final_b:
-                user_point_b.points += 16
+            # Check for final_b matches and add points if not already matched
+            if special.final_b == special_tips.final_b or special.final_b == special_tips.final_a:
+                if 'final_b' not in matched_conditions and special_tips.final_a != special_tips.final_b:
+                    user_point_b.points += 16
+                    matched_conditions.add('final_b')
 
-            # Check for bronze_a matches and add points
+            # Check for bronze_a matches and add points if not already matched
             if special.bronze_a == special_tips.bronze_a or special.bronze_a == special_tips.bronze_b:
-                user_point_b.points += 12
+                if 'bronze_a' not in matched_conditions:
+                    user_point_b.points += 12
+                    matched_conditions.add('bronze_a')
 
-            # Check for bronze_b matches and add points, ensuring correct logic with parentheses
-            if (
-                    special.bronze_b == special_tips.bronze_b or special.bronze_b == special_tips.bronze_a) and special_tips.bronze_a != special_tips.bronze_b:
-                user_point_b.points += 12
+            # Check for bronze_b matches and add points if not already matched
+            if special.bronze_b == special_tips.bronze_b or special.bronze_b == special_tips.bronze_a:
+                if 'bronze_b' not in matched_conditions and special_tips.bronze_a != special_tips.bronze_b:
+                    user_point_b.points += 12
+                    matched_conditions.add('bronze_b')
+
             if special.czech_shooter_first == special_tips.czech_shooter_first:
                 user_point_b.points += 12
             if special.czech_shooter_last == special_tips.czech_shooter_last:
