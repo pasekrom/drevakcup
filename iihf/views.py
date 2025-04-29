@@ -273,8 +273,8 @@ def calculate_points(request, year):
 
     for match in all_matches:
         # Fetch team instances separately for each team in the match
-        team_a = Team.objects.filter(cup=cup).get(name=match.team_a.name)
-        team_b = Team.objects.filter(cup=cup).get(name=match.team_b.name)
+        team_a = Team.objects.get(name=match.team_a.name, year=cup.year)
+        team_b = Team.objects.get(name=match.team_b.name, year=cup.year)
 
         # Increment games played count for each team
         if match.score_a_final is not None and match.score_b_final is not None:
