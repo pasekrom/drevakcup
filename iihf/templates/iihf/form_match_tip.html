@@ -27,16 +27,18 @@
                     <!-- Score A -->
                     <label for="id_score_a_{{ match.id }}"></label>
                     <input type="number" name="score_a_{{ match.id }}" id="id_score_a_{{ match.id }}"
-                           value="{% if form.fields['score_a_'|add:match.id].initial is not none %}{{ form.fields['score_a_'|add:match.id].initial }}{% else %}''{% endif %}"
+                           value="{% if form.fields['score_a_' ~ match.id].initial is not none %}{{ form.fields['score_a_' ~ match.id].initial }}{% else %}''{% endif %}"
                            required>
+
 
                     <!-- Separator : -->
                     <label for="id_score_b_{{ match.id }}">:</label>
 
                     <!-- Score B -->
                     <input type="number" name="score_b_{{ match.id }}" id="id_score_b_{{ match.id }}"
-                           value="{% if form.fields['score_b_'|add:match.id].initial is not none %}{{ form.fields['score_b_'|add:match.id].initial }}{% else %}''{% endif %}"
+                           value="{% if form.fields['score_b_' ~ match.id].initial is not none %}{{ form.fields['score_b_' ~ match.id].initial }}{% else %}''{% endif %}"
                            required>
+
                 </div>
                 {% endfor %}
                 <button type="submit" class="btn btn-primary">Submit</button>
