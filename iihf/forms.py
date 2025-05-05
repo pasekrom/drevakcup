@@ -22,7 +22,7 @@ class MatchTipForm(forms.ModelForm):
 class SpecialTipForm(forms.ModelForm):
     class Meta:
         model = SpecialTip
-        exclude = ['user', 'cup']  # Exclude user and cup fields from the form
+        exclude = ['user', 'cup']
         labels = {
             'winner': 'Vítěz',
             'final_a': 'Finalista 1',
@@ -49,40 +49,24 @@ class SpecialTipForm(forms.ModelForm):
             'overtimes': 'Počet remíz/prodloužení (celkem za MS)',
         }
 
-    def save(self, user, commit=True):
-        # Check if a SpecialTip instance already exists for the user
-        special_tip_instance = SpecialTip.objects.filter(user=user).first()
-
-        # If an instance exists, update its fields with the form data
-        if special_tip_instance:
-            for field, value in self.cleaned_data.items():
-                setattr(special_tip_instance, field, value)
-        else:
-            # If no instance exists, create a new one and assign the user
-            special_tip_instance = super().save(commit=False)
-            special_tip_instance.user = user
-
-        # Save the instance to the database
-        if commit:
-            special_tip_instance.save()
-
-        return special_tip_instance
-
     def __init__(self, *args, cup=None, **kwargs):
         super().__init__(*args, **kwargs)
         if cup:
             year = cup.year
-            self.fields['winner'].queryset = self.fields['final_a'].queryset = self.fields['final_b'].queryset = \
-                self.fields['bronze_a'].queryset = self.fields['bronze_b'].queryset = \
-                self.fields['team_most_goals'].queryset = self.fields['team_least_goals'].queryset = \
-                self.fields['team_first_goal'].queryset = self.fields['team_last_goal'].queryset = \
-                Team.objects.filter(Q(year=year) & (Q(group='A') | Q(group='B')))
+            all_teams = Team.objects.filter(Q(year=year), Q(group__in=['A', 'B']))
+            group_a_teams = Team.objects.filter(year=year, group='A')
+            group_b_teams = Team.objects.filter(year=year, group='B')
 
-            self.fields['group_a_1'].queryset = self.fields['group_a_2'].queryset = \
-                self.fields['group_a_3'].queryset = self.fields['group_a_4'].queryset = \
-                self.fields['team_drop_a'].queryset = Team.objects.filter(Q(year=year) & (Q(group='A')))
+            for field in [
+                'winner', 'final_a', 'final_b', 'bronze_a', 'bronze_b',
+                'team_most_goals', 'team_least_goals',
+                'team_first_goal', 'team_last_goal'
+            ]:
+                self.fields[field].queryset = all_teams
 
-            self.fields['group_b_1'].queryset = self.fields['group_b_2'].queryset = \
-                self.fields['group_b_3'].queryset = self.fields['group_b_4'].queryset = \
-                self.fields['team_drop_b'].queryset = Team.objects.filter(Q(year=year) & (Q(group='B')))
+            for field in ['group_a_1', 'group_a_2', 'group_a_3', 'group_a_4', 'team_drop_a']:
+                self.fields[field].queryset = group_a_teams
+
+            for field in ['group_b_1', 'group_b_2', 'group_b_3', 'group_b_4', 'team_drop_b']:
+                self.fields[field].queryset = group_b_teams
             
