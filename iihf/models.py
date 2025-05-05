@@ -113,7 +113,7 @@ class Special(models.Model):
 
 
 class SpecialTip(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     winner = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='winner_special_tips', blank=True, null=True)
     final_a = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='final_a_special_tips', blank=True, null=True)
     final_b = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='final_b_special_tips', blank=True, null=True)
@@ -141,6 +141,9 @@ class SpecialTip(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+    class Meta:
+        unique_together = ('user', 'cup')
 
 
 class UserPoint(models.Model):
