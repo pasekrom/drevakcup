@@ -202,34 +202,34 @@ class SpecialTipFormView(FormView):
     def get(self, request, *args, **kwargs):
         year = kwargs.get('year')
         cup = get_object_or_404(Cup, year=year)
-        form = self.form_class(cup=cup)
+
+        # Try to get existing SpecialTip instance for this user
+        try:
+            special_tip = SpecialTip.objects.get(user=request.user, cup=cup)
+        except SpecialTip.DoesNotExist:
+            special_tip = None
+
+        form = self.form_class(cup=cup, instance=special_tip)
+
         return render(request, self.template_name, {'form': form, 'year': year})
 
     def post(self, request, *args, **kwargs):
         year = kwargs.get('year')
         cup = get_object_or_404(Cup, year=year)
-        form = SpecialTipForm(request.POST, cup=cup)
+
+        # Get or create the existing instance
+        special_tip, created = SpecialTip.objects.get_or_create(user=request.user, cup=cup)
+
+        form = self.form_class(request.POST, cup=cup, instance=special_tip)
+
         if form.is_valid():
             try:
-                # Get or create a SpecialTip object for the current user
-                special_tip, created = SpecialTip.objects.get_or_create(user=request.user, cup=cup)
-
-                # Update the SpecialTip object with the form data
-                for field in form.cleaned_data:
-                    setattr(special_tip, field, form.cleaned_data[field])
-
-                # Save the changes
-                special_tip.save()
-
-                # Redirect to a success URL
+                form.save()
                 return redirect('iihf-home', year=year)
-
             except Exception as e:
                 print(f"Error saving SpecialTip: {e}")
-                # Fall through to re-render the form with an error
                 form.add_error(None, "An unexpected error occurred while saving your tip.")
 
-        # Always return a response
         return render(request, self.template_name, {'form': form, 'year': year})
 
 
