@@ -217,14 +217,16 @@ class SpecialTipFormView(FormView):
         year = kwargs.get('year')
         cup = get_object_or_404(Cup, year=year)
 
-        # Get or create the existing instance
         special_tip, created = SpecialTip.objects.get_or_create(user=request.user, cup=cup)
 
         form = self.form_class(request.POST, cup=cup, instance=special_tip)
 
         if form.is_valid():
             try:
-                form.save()
+                special_tip = form.save(commit=False)
+                special_tip.user = request.user
+                special_tip.cup = cup
+                special_tip.save()
                 return redirect('iihf-home', year=year)
             except Exception as e:
                 print(f"Error saving SpecialTip: {e}")
