@@ -16,12 +16,27 @@
                 {% csrf_token %}
                 {% for match in matches %}
                 <div class="mb-3">
-                    <h5><img src="{{ match.team_a.flag.url }}" class="team-flag"> {{ match.team_a.name }} - {{ match.team_b.name }} <img src="{{ match.team_b.flag.url }}" class="team-flag"> {{ match.date|date:"j. E H:i" }}</h5>
+                    <h5>
+                        <img src="{{ match.team_a.flag.url }}" class="team-flag">
+                        {{ match.team_a.name }} - {{ match.team_b.name }}
+                        <img src="{{ match.team_b.flag.url }}" class="team-flag">
+                        {{ match.date|date:"j. E H:i" }}
+                    </h5>
                     <input type="hidden" name="match_id" value="{{ match.id }}">
+
+                    <!-- Score A -->
                     <label for="id_score_a_{{ match.id }}"></label>
-                    <input type="number" name="score_a_{{ match.id }}" id="id_score_a_{{ match.id }}" value="0" required>
+                    <input type="number" name="score_a_{{ match.id }}" id="id_score_a_{{ match.id }}"
+                           value="{{ form.score_a_{{ match.id }}.initial if form.score_a_{{ match.id }}.initial is not none else '' }}"
+                           required>
+
+                    <!-- Separator : -->
                     <label for="id_score_b_{{ match.id }}">:</label>
-                    <input type="number" name="score_b_{{ match.id }}" id="id_score_b_{{ match.id }}" value="0" required>
+
+                    <!-- Score B -->
+                    <input type="number" name="score_b_{{ match.id }}" id="id_score_b_{{ match.id }}"
+                           value="{{ form.score_b_{{ match.id }}.initial if form.score_b_{{ match.id }}.initial is not none else '' }}"
+                           required>
                 </div>
                 {% endfor %}
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -29,5 +44,6 @@
         </div>
     </div>
 </div>
+
 
 {% endblock content %}
