@@ -24,19 +24,16 @@
                     </h5>
                     <input type="hidden" name="match_id" value="{{ match.id }}">
 
-                    <!-- Score A -->
                     <label for="id_score_a_{{ match.id }}"></label>
                     <input type="number" name="score_a_{{ match.id }}" id="id_score_a_{{ match.id }}"
-                           value="{% if form.fields['score_a_' ~ match.id].initial is not none %}{{ form.fields['score_a_' ~ match.id].initial }}{% else %}''{% endif %}"
+                           value=""
                            required>
 
 
-                    <!-- Separator : -->
                     <label for="id_score_b_{{ match.id }}">:</label>
 
-                    <!-- Score B -->
                     <input type="number" name="score_b_{{ match.id }}" id="id_score_b_{{ match.id }}"
-                           value="{% if form.fields['score_b_' ~ match.id].initial is not none %}{{ form.fields['score_b_' ~ match.id].initial }}{% else %}''{% endif %}"
+                           value=""
                            required>
 
                 </div>
