@@ -10,8 +10,8 @@
 </style>
 
 <div class="container">
-    <div class="row justify-content-center mt-5 mb-5"> <!-- Add these classes -->
-        <div class="col-md-8"> <!-- Optionally, you can specify the width of the form -->
+    <div class="row justify-content-center mt-5 mb-5">
+        <div class="col-md-8">
             <form method="post">
                 {% csrf_token %}
                 {% for match in matches %}
@@ -27,7 +27,7 @@
                     <!-- Score A -->
                     <label for="id_score_a_{{ match.id }}"></label>
                     <input type="number" name="score_a_{{ match.id }}" id="id_score_a_{{ match.id }}"
-                           value="{% if form.fields.score_a_{{ match.id }}.initial is not none %}{{ form.fields.score_a_{{ match.id }}.initial }}{% else %}''{% endif %}"
+                           value="{% if form.fields['score_a_'|add:match.id].initial is not none %}{{ form.fields['score_a_'|add:match.id].initial }}{% else %}''{% endif %}"
                            required>
 
                     <!-- Separator : -->
@@ -35,7 +35,7 @@
 
                     <!-- Score B -->
                     <input type="number" name="score_b_{{ match.id }}" id="id_score_b_{{ match.id }}"
-                           value="{% if form.fields.score_b_{{ match.id }}.initial is not none %}{{ form.fields.score_b_{{ match.id }}.initial }}{% else %}''{% endif %}"
+                           value="{% if form.fields['score_b_'|add:match.id].initial is not none %}{{ form.fields['score_b_'|add:match.id].initial }}{% else %}''{% endif %}"
                            required>
                 </div>
                 {% endfor %}
@@ -44,6 +44,7 @@
         </div>
     </div>
 </div>
+
 
 
 {% endblock content %}
