@@ -4,19 +4,20 @@ from django.db.models import Q
 from .models import MatchTip, SpecialTip, Team
 
 
-class MatchTipForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        match_tips = kwargs.pop('match_tips', None)
-        super(MatchTipForm, self).__init__(*args, **kwargs)
-        if match_tips:
-            for match_id, match_tip in match_tips.items():
-                if match_tip:
-                    self.fields[f'score_a_{match_id}'].initial = match_tip.score_a
-                    self.fields[f'score_b_{match_id}'].initial = match_tip.score_b
+class MatchTipForm(forms.Form):
+    def __init__(self, *args, matches=None, match_tips=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if matches:
+            for match in matches:
+                self.fields[f'score_a_{match.id}'] = forms.IntegerField(
+                    label=f"{match.team_a.name} góly", min_value=0, required=False)
+                self.fields[f'score_b_{match.id}'] = forms.IntegerField(
+                    label=f"{match.team_b.name} góly", min_value=0, required=False)
 
-    class Meta:
-        model = MatchTip
-        fields = ['score_a', 'score_b']
+                # If tips exist, pre-fill
+                if match_tips and match.id in match_tips and match_tips[match.id]:
+                    self.fields[f'score_a_{match.id}'].initial = match_tips[match.id].score_a
+                    self.fields[f'score_b_{match.id}'].initial = match_tips[match.id].score_b
 
 
 class SpecialTipForm(forms.ModelForm):

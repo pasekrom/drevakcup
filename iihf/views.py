@@ -144,55 +144,39 @@ class MatchTipFormView(FormView):
     template_name = 'iihf/form_match_tip.html'
     form_class = MatchTipForm
 
+    def get_matches_and_tips(self, year):
+        matches = Match.objects.filter(cup__year=year).order_by('date', 'team_a__group')
+        match_tips = {
+            match.id: MatchTip.objects.filter(match=match, user=self.request.user).first()
+            for match in matches
+        }
+        return matches, match_tips
+
     def get(self, request, *args, **kwargs):
-        matches = Match.objects.filter(cup__year=kwargs.get('year')).order_by('date', 'team_a__group')
-        match_tips = {}
-        for match in matches:
-            try:
-                match_tip = MatchTip.objects.get(match=match, user=request.user)
-            except MatchTip.DoesNotExist:
-                match_tip = None
-            match_tips[match.id] = match_tip
-        initial_values = {}
-        for match_id, match_tip in match_tips.items():
-            if match_tip:
-                initial_values[f'score_a_{match_id}'] = match_tip.score_a
-                initial_values[f'score_b_{match_id}'] = match_tip.score_b
-            else:
-                initial_values[f'score_a_{match_id}'] = 0
-                initial_values[f'score_b_{match_id}'] = 0
-        form = MatchTipForm(initial=initial_values)
-        return render(request, self.template_name, {'matches': matches, 'form': form, 'year': kwargs.get('year')})
+        year = kwargs.get('year')
+        matches, match_tips = self.get_matches_and_tips(year)
+        form = MatchTipForm(matches=matches, match_tips=match_tips)
+        return render(request, self.template_name, {'matches': matches, 'form': form, 'year': year})
 
     def post(self, request, *args, **kwargs):
-        for match in Match.objects.all():
-            score_a = request.POST.get(f'score_a_{match.id}')
-            score_b = request.POST.get(f'score_b_{match.id}')
+        year = kwargs.get('year')
+        matches, _ = self.get_matches_and_tips(year)
+        form = MatchTipForm(request.POST, matches=matches)
 
-            # Check if both scores are provided
-            if score_a is not None and score_b is not None:
-                # Check if MatchTip already exists for the current user and match
-                try:
-                    match_tip = MatchTip.objects.get(match=match, user=request.user)
-                except MatchTip.DoesNotExist:
-                    match_tip = None
+        if form.is_valid():
+            for match in matches:
+                score_a = form.cleaned_data.get(f'score_a_{match.id}')
+                score_b = form.cleaned_data.get(f'score_b_{match.id}')
 
-                # Update or create MatchTip instance
-                if match_tip:
-                    # MatchTip already exists, update scores
+                if score_a is not None and score_b is not None:
+                    match_tip, _ = MatchTip.objects.get_or_create(match=match, user=request.user)
                     match_tip.score_a = score_a
                     match_tip.score_b = score_b
                     match_tip.save()
-                else:
-                    # MatchTip doesn't exist, create new instance
-                    MatchTip.objects.create(
-                        match=match,
-                        user=request.user,
-                        score_a=score_a,
-                        score_b=score_b
-                    )
 
-        return redirect('iihf-home', year=kwargs.get('year'))
+            return redirect('iihf-home', year=year)
+
+        return render(request, self.template_name, {'matches': matches, 'form': form, 'year': year})
 
 
 class SpecialTipFormView(FormView):
