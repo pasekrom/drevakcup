@@ -195,42 +195,33 @@ class MatchTipFormView(FormView):
         return redirect('iihf-home', year=kwargs.get('year'))
 
 
-class SpecialTipFormView(FormView):
-    template_name = 'iihf/form_special.html'
-    form_class = SpecialTipForm
+def post(self, request, *args, **kwargs):
+    year = kwargs.get('year')
+    cup = get_object_or_404(Cup, year=year)
+    form = SpecialTipForm(request.POST, cup=cup)
+    if form.is_valid():
+        try:
+            # Get or create a SpecialTip object for the current user
+            special_tip, created = SpecialTip.objects.get_or_create(user=request.user, cup=cup)
 
-    def get(self, request, *args, **kwargs):
-        year = kwargs.get('year')
-        cup = get_object_or_404(Cup, year=year)
-        form = self.form_class(cup=cup)
-        return render(request, self.template_name, {'form': form, 'year': year})
+            # Update the SpecialTip object with the form data
+            for field in form.cleaned_data:
+                setattr(special_tip, field, form.cleaned_data[field])
 
-    def post(self, request, *args, **kwargs):
-        year = kwargs.get('year')
-        cup = get_object_or_404(Cup, year=year)
-        form = SpecialTipForm(request.POST, cup=cup)
-        if form.is_valid():
-            try:
-                # Get or create a SpecialTip object for the current user
-                special_tip, created = SpecialTip.objects.get_or_create(user=request.user, cup=cup)
+            # Save the changes
+            special_tip.save()
 
-                # Update the SpecialTip object with the form data
-                for field in form.cleaned_data:
-                    setattr(special_tip, field, form.cleaned_data[field])
+            # Redirect to a success URL
+            return redirect('iihf-home', year=year)
 
-                # Save the changes
-                special_tip.save()
+        except Exception as e:
+            print(f"Error saving SpecialTip: {e}")
+            # Fall through to re-render the form with an error
+            form.add_error(None, "An unexpected error occurred while saving your tip.")
 
-                # Redirect to a success URL
-                return redirect('iihf-home', year=kwargs.get('year'))
-            except Exception as e:
-                # Handle any unexpected errors
-                print(f"Error saving SpecialTip: {e}")
-                # You can customize error handling here, such as displaying a message to the user
-                pass
-        else:
-            # If the form is not valid, re-render the form with errors
-            return render(request, self.template_name, {'form': form, 'year': kwargs.get('year')})
+    # Always return a response
+    return render(request, self.template_name, {'form': form, 'year': year})
+
 
 
 def reset_team_statistics():
