@@ -168,8 +168,10 @@ class MatchTipFormView(FormView):
                 score_a = form.cleaned_data.get(f'score_a_{match.id}')
                 score_b = form.cleaned_data.get(f'score_b_{match.id}')
 
+                # Kontrola, jestli byla skóre skutečně vyplněna
                 if score_a is not None and score_b is not None:
-                    match_tip, _ = MatchTip.objects.get_or_create(match=match, user=request.user)
+                    # get_or_create nemůže selhat kvůli null hodnotám
+                    match_tip, created = MatchTip.objects.get_or_create(match=match, user=request.user)
                     match_tip.score_a = score_a
                     match_tip.score_b = score_b
                     match_tip.save()

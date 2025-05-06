@@ -78,8 +78,8 @@ class Playoff(models.Model):
 class MatchTip(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    score_a = models.IntegerField()
-    score_b = models.IntegerField()
+    score_a = models.IntegerField(blank=True, null=True)
+    score_b = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.user} - {self.match}'
