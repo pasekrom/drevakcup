@@ -21,6 +21,10 @@ ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()
 ]
 
+# Veřejná URL webu (https://… bez koncového /). Pro správné odkazy na /static/team_flags/… v JSON (vlajky),
+# když je Django za proxy a request.build_absolute_uri dává špatný host nebo http.
+SITE_PUBLIC_URL = os.getenv('SITE_PUBLIC_URL', '').strip().rstrip('/')
+
 
 def _split_origins(env_key, defaults):
     """Čárkou oddělené URL se schématem (např. https://example.cz)."""

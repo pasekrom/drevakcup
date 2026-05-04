@@ -49,9 +49,9 @@
               >
                 <td class="sticky left-0 z-10 bg-white px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.04)] min-w-[9rem]">
                   <span class="inline-flex items-center gap-1.5 flex-wrap">
-                    <TeamWithFlag :team="m.team_a" />
+                    <TeamWithFlag display="shortcut" :team="m.team_a" />
                     <span class="text-gray-400">–</span>
-                    <TeamWithFlag :team="m.team_b" />
+                    <TeamWithFlag display="shortcut" :team="m.team_b" />
                   </span>
                 </td>
                 <td class="px-3 py-2 text-gray-600 whitespace-nowrap border-r border-gray-200 bg-white">

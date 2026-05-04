@@ -8,12 +8,14 @@
       loading="lazy"
     />
     <span class="w-4 h-4 flex-shrink-0 rounded bg-gray-200" v-else-if="showPlaceholder" />
-    <span>{{ team?.shortcut || team?.name || '—' }}</span>
+    <span>{{ labelText }}</span>
   </span>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   team: {
     type: Object,
     default: null,
@@ -22,5 +24,20 @@ defineProps({
     type: Boolean,
     default: true,
   },
+  /** 'name' = celý název z DB (default), 'shortcut' = CZE/CAN pro přehledové tabulky */
+  display: {
+    type: String,
+    default: 'name',
+    validator: (v) => v === 'name' || v === 'shortcut',
+  },
+})
+
+const labelText = computed(() => {
+  const t = props.team
+  if (!t) return '—'
+  if (props.display === 'shortcut') {
+    return t.shortcut || t.name || '—'
+  }
+  return t.name || t.shortcut || '—'
 })
 </script>

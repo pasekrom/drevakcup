@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from django.templatetags.static import static as django_static
 
+from .flag_urls import public_or_request_url
 from .models import Cup, Match, MatchTip, Special, SpecialTip, Team, User, UserPoint
 from .services import is_tournament_started
 
@@ -72,12 +73,12 @@ def _team_dict_for_matrix(team: Team, request) -> dict:
     sc = get_team_flag_shortcut(team.name)
     code_upper = sc.upper() if sc else None
     flag_url = None
-    if request:
-        if team.flag:
-            flag_url = request.build_absolute_uri(team.flag.url)
-        elif sc:
-            rel = django_static(f'team_flags/{sc}.png')
-            flag_url = request.build_absolute_uri(rel)
+    if team.flag:
+        u = team.flag.url
+        flag_url = u if u.startswith('http') else public_or_request_url(request, u)
+    elif sc:
+        rel = django_static(f'team_flags/{sc}.png')
+        flag_url = public_or_request_url(request, rel)
     return {
         'id': team.id,
         'name': team.name,

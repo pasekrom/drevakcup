@@ -8,6 +8,7 @@ TEAM_NAME_TO_SHORTCUT = {
     'Česko': 'cze',
     'Česká republika': 'cze',
     'Kanada': 'can',
+    'Kanda': 'can',  # častý překlep
     'Canada': 'can',
     'Švédsko': 'swe',
     'Sweden': 'swe',
@@ -58,6 +59,36 @@ TEAM_NAME_TO_SHORTCUT = {
     'China': 'chn',
 }
 
+# IIHF / ISO 3 písmena (název týmu v DB jen jako kód)
+IIHF_CODE_TO_FILE = {
+    'CZE': 'cze',
+    'SVK': 'svk',
+    'SUI': 'sui',
+    'FIN': 'fin',
+    'USA': 'usa',
+    'SWE': 'swe',
+    'LAT': 'lat',
+    'CAN': 'can',
+    'GER': 'ger',
+    'AUT': 'aut',
+    'NOR': 'nor',
+    'DEN': 'den',
+    'FRA': 'fra',
+    'ITA': 'ita',
+    'KAZ': 'kaz',
+    'POL': 'pol',
+    'UKR': 'ukr',
+    'GBR': 'gbr',
+    'SVN': 'svn',
+    'HUN': 'hun',
+    'JPN': 'jpn',
+    'KOR': 'kor',
+    'CHN': 'chn',
+    'RUS': 'rus',
+    'BLR': 'blr',
+}
+
+
 # Normalize for lookup: strip whitespace, optional case-insensitive
 def get_team_flag_shortcut(team_name):
     """Return 3-letter shortcut for flag filename, or None if not in mapping."""
@@ -66,7 +97,12 @@ def get_team_flag_shortcut(team_name):
     key = team_name.strip()
     if key in TEAM_NAME_TO_SHORTCUT:
         return TEAM_NAME_TO_SHORTCUT[key]
-    # Case-insensitive fallback
+    # Přesně třípísmenný kód (LAT, CZE, …)
+    if len(key) == 3 and key.isalpha():
+        k3 = key.upper()
+        if k3 in IIHF_CODE_TO_FILE:
+            return IIHF_CODE_TO_FILE[k3]
+    # Case-insensitive fallback na dlouhé názvy
     for name, code in TEAM_NAME_TO_SHORTCUT.items():
         if name.lower() == key.lower():
             return code

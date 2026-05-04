@@ -8,24 +8,23 @@
 
     <div v-else class="space-y-6">
       <div
-        v-if="firstMatchDate"
-        class="rounded-lg border p-4 text-sm"
-        :class="tournamentStarted ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-gray-200 bg-gray-50 text-gray-800'"
+        v-if="!tournamentStarted"
+        class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800"
       >
-        <template v-if="tournamentStarted">
-          Turnaj už začal (první zápas {{ formatDateTime(firstMatchDate) }}). Tvoje speciální tipy jsou uzamčené;
-          níže vidíš svůj tip a oficiální výsledek u každé položky.
-        </template>
-        <template v-else>
-          Do začátku prvního zápasu ({{ formatDateTime(firstMatchDate) }}) můžeš tipy měnit a uložit.
-          Po začátku se zobrazí jen náhled a výsledky.
-        </template>
+        <p class="font-medium text-gray-900">
+          Speciální tipy můžeš upravovat, dokud nezačne první zápas.
+        </p>
+        <p v-if="firstMatchDate" class="mt-2 text-gray-700">
+          První utkání turnaje začíná {{ formatDateTime(firstMatchDate) }}.
+        </p>
       </div>
       <div
         v-else
-        class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800"
+        class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
       >
-        Zatím není v systému žádný zápas tohoto turnaje — speciální tipy můžeš upravovat, dokud správce nepřidá první zápas s časem začátku.
+        Turnaj už začal
+        <template v-if="firstMatchDate"> (první zápas {{ formatDateTime(firstMatchDate) }})</template>.
+        Tvoje speciální tipy jsou uzamčené; níže vidíš svůj tip a oficiální výsledek u každé položky.
       </div>
 
       <p
@@ -366,10 +365,8 @@ const sections = computed(() => [
   },
 ])
 
-const tournamentStarted = computed(() => {
-  if (!firstMatchDate.value) return false
-  return new Date(firstMatchDate.value).getTime() <= Date.now()
-})
+/** Stejné jako backend `is_tournament_started` (čas prvního zápasu vs. teď). */
+const tournamentStarted = computed(() => !!props.cup?.tournament_started)
 
 const teamsForFinalA = computed(() =>
   allTeams.value.filter((t) => t.id !== form.value.final_b_id || t.id === form.value.final_a_id)
@@ -599,7 +596,7 @@ async function loadData() {
       firstMatchDate.value = null
     }
 
-    const started = firstMatchDate.value && new Date(firstMatchDate.value).getTime() <= Date.now()
+    const started = !!props.cup?.tournament_started
     specialResult.value = null
     if (started) {
       try {

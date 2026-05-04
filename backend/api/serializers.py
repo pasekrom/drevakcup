@@ -91,20 +91,22 @@ class TeamSerializer(serializers.ModelSerializer):
         return code.upper() if code else None
     
     def get_flag_url(self, obj):
-        request = self.context.get('request')
-        # 1. Use uploaded flag if set
-        if obj.flag:
-            if request:
-                return request.build_absolute_uri(obj.flag.url)
-            return obj.flag.url
-        # 2. Resolve by team name -> shortcut (e.g. Kanada -> can.png)
+        from .flag_urls import public_or_request_url
         from .team_flags import get_team_flag_shortcut
+
+        request = self.context.get('request')
+        # 1. Nahraná vlajka
+        if obj.flag:
+            url = obj.flag.url
+            if url.startswith('http'):
+                return url
+            return public_or_request_url(request, url)
+        # 2. Bundlované PNG podle názvu / zkratky týmu
         shortcut = get_team_flag_shortcut(obj.name)
-        if shortcut and request:
-            # Bundled flags: api/static/team_flags/{shortcut}.png → /static/team_flags/...
-            rel = static_url(f'team_flags/{shortcut}.png')
-            return request.build_absolute_uri(rel)
-        return None
+        if not shortcut:
+            return None
+        rel = static_url(f'team_flags/{shortcut}.png')
+        return public_or_request_url(request, rel)
     
     def create(self, validated_data):
         cup_id = validated_data.pop('cup_id')
