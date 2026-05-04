@@ -38,6 +38,9 @@ const labelText = computed(() => {
   if (props.display === 'shortcut') {
     return t.shortcut || t.name || '—'
   }
-  return t.display_name || t.name || t.shortcut || '—'
+  // Režim „celý název“: zkratku použij jen když v DB opravdu není nic rozumného (jinak starý build zobrazil CZE i u „Česko“).
+  const full = String(t.display_name || t.name || '').trim()
+  if (full) return full
+  return t.shortcut || '—'
 })
 </script>
