@@ -1,6 +1,7 @@
 """
 Serializers for API endpoints.
 """
+from django.templatetags.static import static as static_url
 from rest_framework import serializers
 from .models import (
     User, Cup, Team, Match, Playoff, MatchTip, SpecialTip, Special, UserPoint
@@ -34,11 +35,26 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CupSerializer(serializers.ModelSerializer):
     """Cup serializer."""
-    
+
+    tournament_started = serializers.SerializerMethodField()
+
     class Meta:
         model = Cup
-        fields = ['id', 'year', 'logo', 'location', 'date_start', 'date_end']
-        read_only_fields = ['id']
+        fields = [
+            'id',
+            'year',
+            'logo',
+            'location',
+            'date_start',
+            'date_end',
+            'tournament_started',
+        ]
+        read_only_fields = ['id', 'tournament_started']
+
+    def get_tournament_started(self, obj):
+        from .services import is_tournament_started
+
+        return is_tournament_started(obj)
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -85,9 +101,9 @@ class TeamSerializer(serializers.ModelSerializer):
         from .team_flags import get_team_flag_shortcut
         shortcut = get_team_flag_shortcut(obj.name)
         if shortcut and request:
-            # e.g. /media/team_flags/can.png
-            path = f'/media/team_flags/{shortcut}.png'
-            return request.build_absolute_uri(path)
+            # Bundled flags: api/static/team_flags/{shortcut}.png → /static/team_flags/...
+            rel = static_url(f'team_flags/{shortcut}.png')
+            return request.build_absolute_uri(rel)
         return None
     
     def create(self, validated_data):
@@ -165,22 +181,79 @@ class MatchSerializer(serializers.ModelSerializer):
 
 
 class PlayoffSerializer(serializers.ModelSerializer):
-    """Playoff serializer."""
+    """Playoff serializer (základní čas + skóre; týmy volitelné až po založení řádků)."""
+
     team_a = TeamSerializer(read_only=True)
     team_b = TeamSerializer(read_only=True)
-    team_a_id = serializers.IntegerField(write_only=True)
-    team_b_id = serializers.IntegerField(write_only=True)
+    team_a_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    team_b_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     cup = CupSerializer(read_only=True)
-    cup_id = serializers.IntegerField(write_only=True)
-    
+    cup_id = serializers.IntegerField(write_only=True, required=False)
+
     class Meta:
         model = Playoff
         fields = [
             'id', 'playoff_type', 'team_a', 'team_b', 'team_a_id', 'team_b_id',
             'score_a', 'score_b', 'score_a_final', 'score_b_final',
-            'overtime', 'shootout', 'date', 'cup', 'cup_id'
+            'overtime', 'shootout', 'date', 'cup', 'cup_id',
         ]
         read_only_fields = ['id']
+
+    def validate(self, attrs):
+        cup = attrs.get('cup')
+        if cup is None and self.instance:
+            cup = self.instance.cup
+        if cup is None and attrs.get('cup_id'):
+            cup = Cup.objects.filter(pk=attrs['cup_id']).first()
+        for key in ('team_a_id', 'team_b_id'):
+            if key not in attrs:
+                continue
+            tid = attrs.get(key)
+            if tid is None or cup is None:
+                continue
+            if not Team.objects.filter(id=tid, cup=cup).exists():
+                raise serializers.ValidationError({key: 'Tým nepatří do tohoto turnaje.'})
+        return attrs
+
+    def create(self, validated_data):
+        from .models import Cup, Team
+
+        cup_id = validated_data.pop('cup_id')
+        cup = Cup.objects.get(id=cup_id)
+        team_a_id = validated_data.pop('team_a_id', None)
+        team_b_id = validated_data.pop('team_b_id', None)
+        validated_data['cup'] = cup
+        validated_data['team_a'] = Team.objects.get(pk=team_a_id) if team_a_id is not None else None
+        validated_data['team_b'] = Team.objects.get(pk=team_b_id) if team_b_id is not None else None
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        from .models import Cup, Team
+
+        if 'cup_id' in validated_data:
+            instance.cup = Cup.objects.get(id=validated_data.pop('cup_id'))
+        if 'team_a_id' in validated_data:
+            tid = validated_data.pop('team_a_id')
+            instance.team_a = Team.objects.get(pk=tid) if tid is not None else None
+        if 'team_b_id' in validated_data:
+            tid = validated_data.pop('team_b_id')
+            instance.team_b = Team.objects.get(pk=tid) if tid is not None else None
+        if 'score_a' in validated_data or 'score_b' in validated_data:
+            validated_data.setdefault(
+                'score_a_final',
+                validated_data.get('score_a', instance.score_a),
+            )
+            validated_data.setdefault(
+                'score_b_final',
+                validated_data.get('score_b', instance.score_b),
+            )
+        sa = validated_data.get('score_a', instance.score_a)
+        sb = validated_data.get('score_b', instance.score_b)
+        sa_f = validated_data.get('score_a_final', instance.score_a_final)
+        sb_f = validated_data.get('score_b_final', instance.score_b_final)
+        if sa is not None and sb is not None and sa_f is not None and sb_f is not None:
+            validated_data['overtime'] = (sa != sa_f or sb != sb_f)
+        return super().update(instance, validated_data)
 
 
 class MatchTipSerializer(serializers.ModelSerializer):
@@ -195,16 +268,20 @@ class MatchTipSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user']
     
     def validate(self, data):
-        """Validate that match hasn't started."""
-        match_id = data.get('match_id') or self.instance.match_id if self.instance else None
-        if match_id:
-            try:
-                match = Match.objects.get(id=match_id)
-                from django.utils import timezone
-                if timezone.now() >= match.date:
-                    raise serializers.ValidationError("Cannot modify tip after match has started.")
-            except Match.DoesNotExist:
-                pass
+        """Tipy na zápasy jen do začátku prvního zápasu turnaje (viz is_tournament_started)."""
+        from .services import is_tournament_started
+
+        match = None
+        if self.instance:
+            match = self.instance.match
+        else:
+            match_id = data.get('match_id')
+            if match_id:
+                match = Match.objects.filter(id=match_id).select_related('cup').first()
+        if match and is_tournament_started(match.cup):
+            raise serializers.ValidationError(
+                'Turnaj už začal — tipy na zápasy nelze měnit.'
+            )
         return data
 
 
@@ -277,6 +354,14 @@ class SpecialTipSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'user']
     
+    def validate(self, attrs):
+        """Model nemá u těchto polí null=True — prázdná hodnota z formuláře jako null musí být 0."""
+        if 'max_goals_per_game' in attrs and attrs['max_goals_per_game'] is None:
+            attrs['max_goals_per_game'] = 0
+        if 'overtimes' in attrs and attrs['overtimes'] is None:
+            attrs['overtimes'] = 0
+        return attrs
+    
     def create(self, validated_data):
         """Create SpecialTip; map _id fields to model (Django accepts winner_id=...)."""
         return SpecialTip.objects.create(**validated_data)
@@ -297,10 +382,40 @@ class SpecialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Special
         fields = '__all__'
-        read_only_fields = ['id']
+        read_only_fields = [
+            'id',
+            'winner',
+            'final_a',
+            'final_b',
+            'bronze_a',
+            'bronze_b',
+            'team_most_goals',
+            'team_least_goals',
+            'max_goals_per_game',
+            'overtimes',
+        ]
     
     def create(self, validated_data):
         cup_id = validated_data.pop('cup_id', None) or validated_data.pop('cup', None)
+        for k in (
+            'winner',
+            'final_a',
+            'final_b',
+            'bronze_a',
+            'bronze_b',
+            'winner_id',
+            'final_a_id',
+            'final_b_id',
+            'bronze_a_id',
+            'bronze_b_id',
+            'max_goals_per_game',
+            'overtimes',
+            'team_most_goals',
+            'team_least_goals',
+            'team_most_goals_id',
+            'team_least_goals_id',
+        ):
+            validated_data.pop(k, None)
         if cup_id is not None:
             from .models import Cup
             validated_data['cup'] = Cup.objects.get(pk=cup_id)
@@ -309,6 +424,25 @@ class SpecialSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data.pop('cup_id', None)
         validated_data.pop('cup', None)
+        for k in (
+            'winner',
+            'final_a',
+            'final_b',
+            'bronze_a',
+            'bronze_b',
+            'winner_id',
+            'final_a_id',
+            'final_b_id',
+            'bronze_a_id',
+            'bronze_b_id',
+            'max_goals_per_game',
+            'overtimes',
+            'team_most_goals',
+            'team_least_goals',
+            'team_most_goals_id',
+            'team_least_goals_id',
+        ):
+            validated_data.pop(k, None)
         return super().update(instance, validated_data)
 
 

@@ -36,11 +36,12 @@
             Zápasy
           </router-link>
           <router-link
+            v-if="!cup.tournament_started"
             :to="`/cup/${cup.year}/tips`"
             class="py-4 px-1 border-b-2 font-medium text-sm"
             :class="isActive('cup-tips') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
           >
-            Moje tipy
+            Vyplnění tipů
           </router-link>
           <router-link
             :to="`/cup/${cup.year}/special-tips`"
@@ -55,6 +56,20 @@
             :class="isActive('cup-teams') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
           >
             Týmy
+          </router-link>
+          <router-link
+            :to="`/cup/${cup.year}/playoff`"
+            class="py-4 px-1 border-b-2 font-medium text-sm"
+            :class="isActive('cup-playoff') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          >
+            Play-off
+          </router-link>
+          <router-link
+            :to="`/cup/${cup.year}/tips-overview`"
+            class="py-4 px-1 border-b-2 font-medium text-sm"
+            :class="isActive('cup-tips-overview') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          >
+            Přehled tipů
           </router-link>
           <router-link
             :to="`/cup/${cup.year}/ladder`"

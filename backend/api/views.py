@@ -18,6 +18,7 @@ from .serializers import (
     UserPointSerializer, LadderSerializer, UserSerializer
 )
 from .services import calculate_points, is_tournament_started
+from .tips_matrix import build_tips_matrix
 
 
 class CupViewSet(viewsets.ModelViewSet):
@@ -29,6 +30,8 @@ class CupViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ('list', 'retrieve', 'current'):
             return [AllowAny()]
+        if self.action == 'tips_matrix':
+            return [IsAuthenticated()]
         return [IsAdminUser()]
     
     @action(detail=False, methods=['get'])
@@ -39,6 +42,12 @@ class CupViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'No cup found'}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(cup)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def tips_matrix(self, request, pk=None):
+        """Přehled tipů všech uživatelů (zápasy + speciál) pro jeden turnaj."""
+        cup = self.get_object()
+        return Response(build_tips_matrix(cup, request))
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -79,7 +88,7 @@ class MatchViewSet(viewsets.ModelViewSet):
     ordering = ['date']
     
     def get_permissions(self):
-        if self.action in ('list', 'retrieve', 'tips'):
+        if self.action in ('list', 'retrieve', 'tips', 'upcoming'):
             return [IsAuthenticated()]
         return [IsAdminUser()]
     
@@ -109,15 +118,88 @@ class MatchViewSet(viewsets.ModelViewSet):
         serializer = MatchTipSerializer(tips, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def upcoming(self, request):
+        """Nejbližší zápasy, které ještě nezačaly (čas serveru / DB), seřazené podle data."""
+        try:
+            limit = int(request.query_params.get('limit', '4'))
+        except ValueError:
+            limit = 4
+        limit = max(1, min(limit, 20))
+        # get_queryset() only — nefilter_queryset(), ať ?ordering= z requestu nezmění výběr „nejbližších“
+        qs = (
+            self.get_queryset()
+            .filter(date__gt=timezone.now())
+            .order_by('date')[:limit]
+        )
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
-class PlayoffViewSet(viewsets.ReadOnlyModelViewSet):
-    """Playoff viewset."""
+
+class PlayoffViewSet(viewsets.ModelViewSet):
+    """Playoff viewset — čtení pro přihlášené, zápis jen staff."""
+
     queryset = Playoff.objects.select_related('team_a', 'team_b', 'cup')
     serializer_class = PlayoffSerializer
     permission_classes = [IsAuthenticated]
     filterset_fields = ['cup', 'playoff_type']
-    ordering_fields = ['date']
-    ordering = ['date']
+    ordering_fields = ['date', 'playoff_type']
+    ordering = ['playoff_type']
+
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        calculate_points(instance.cup)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        calculate_points(instance.cup)
+
+    def perform_destroy(self, instance):
+        cup = instance.cup
+        super().perform_destroy(instance)
+        calculate_points(cup)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
+    def ensure(self, request):
+        """Založí 8 play-off řádků (QF×4, SF×2, bronz, finále), pokud ještě neexistují."""
+        from datetime import datetime, time
+
+        cup_id = request.data.get('cup_id')
+        if not cup_id:
+            return Response(
+                {'detail': 'cup_id is required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        cup = get_object_or_404(Cup, pk=cup_id)
+        order = ['QFA1', 'QFA2', 'QFB1', 'QFB2', 'SFA', 'SFB', 'BMG', 'GMG']
+        if cup.date_end:
+            dt = timezone.make_aware(datetime.combine(cup.date_end, time(20, 0)))
+        else:
+            dt = timezone.now()
+        created_types = []
+        for ptype in order:
+            _, was_created = Playoff.objects.get_or_create(
+                cup=cup,
+                playoff_type=ptype,
+                defaults={
+                    'date': dt,
+                    'team_a': None,
+                    'team_b': None,
+                },
+            )
+            if was_created:
+                created_types.append(ptype)
+        calculate_points(cup)
+        qs = Playoff.objects.filter(cup=cup).select_related('team_a', 'team_b', 'cup').order_by(
+            'playoff_type'
+        )
+        ser = PlayoffSerializer(qs, many=True, context={'request': request})
+        return Response({'created': created_types, 'playoffs': ser.data})
 
 
 class MatchTipViewSet(viewsets.ModelViewSet):
@@ -156,9 +238,35 @@ class MatchTipViewSet(viewsets.ModelViewSet):
     def bulk_update(self, request):
         """Bulk update match tips."""
         tips_data = request.data.get('tips', [])
+        cup_ids = set()
+        for tip_data in tips_data:
+            match_id = tip_data.get('match_id')
+            if match_id is None:
+                continue
+            try:
+                m = Match.objects.select_related('cup').get(id=match_id)
+                cup_ids.add(m.cup_id)
+            except Match.DoesNotExist:
+                return Response(
+                    {'detail': f'Zápas {match_id} nenalezen.'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        if len(cup_ids) > 1:
+            return Response(
+                {'detail': 'Všechny tipy musí patřit do stejného turnaje.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if cup_ids:
+            cup = Cup.objects.get(pk=next(iter(cup_ids)))
+            if is_tournament_started(cup):
+                return Response(
+                    {'detail': 'Turnaj už začal — tipy na zápasy nelze měnit.'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
         created_count = 0
         updated_count = 0
-        
+
         for tip_data in tips_data:
             match_id = tip_data.get('match_id')
             score_a = tip_data.get('score_a')
@@ -169,10 +277,7 @@ class MatchTipViewSet(viewsets.ModelViewSet):
             
             try:
                 match = Match.objects.get(id=match_id)
-                # Check if match has started
-                if timezone.now() >= match.date:
-                    continue
-                
+
                 match_tip, created = MatchTip.objects.get_or_create(
                     match=match,
                     user=request.user,
@@ -215,6 +320,16 @@ class SpecialTipViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
+    def _reject_if_tournament_started(self, cup):
+        if is_tournament_started(cup):
+            return Response(
+                {
+                    'detail': 'Turnaj už začal (od začátku prvního zápasu). Speciální tipy nelze měnit.',
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return None
+
     def create(self, request, *args, **kwargs):
         """Create or update special tip for this user+cup (idempotent save)."""
         cup_id = request.data.get('cup_id')
@@ -223,6 +338,10 @@ class SpecialTipViewSet(viewsets.ModelViewSet):
                 {'detail': 'cup_id is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        cup = get_object_or_404(Cup, pk=cup_id)
+        blocked = self._reject_if_tournament_started(cup)
+        if blocked:
+            return blocked
         existing = self.get_queryset().filter(cup_id=cup_id).first()
         if existing:
             serializer = self.get_serializer(existing, data=request.data, partial=True)
@@ -230,6 +349,20 @@ class SpecialTipViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        blocked = self._reject_if_tournament_started(instance.cup)
+        if blocked:
+            return blocked
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        blocked = self._reject_if_tournament_started(instance.cup)
+        if blocked:
+            return blocked
+        return super().partial_update(request, *args, **kwargs)
     
     @action(detail=False, methods=['get'])
     def by_cup(self, request):

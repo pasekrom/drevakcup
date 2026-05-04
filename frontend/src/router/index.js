@@ -45,6 +45,16 @@ const routes = [
         component: () => import('../views/cup/TeamsView.vue'),
       },
       {
+        path: 'playoff',
+        name: 'cup-playoff',
+        component: () => import('../views/cup/PlayoffView.vue'),
+      },
+      {
+        path: 'tips-overview',
+        name: 'cup-tips-overview',
+        component: () => import('../views/cup/TipsOverviewView.vue'),
+      },
+      {
         path: 'ladder',
         name: 'cup-ladder',
         component: () => import('../views/cup/LadderView.vue'),

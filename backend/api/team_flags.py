@@ -1,6 +1,6 @@
 """
 IIHF team name (Czech/long) to official 3-letter shortcut mapping.
-Used to resolve team flag filenames: {shortcut}.png in media/team_flags/
+Used to resolve bundled flag filenames: {shortcut}.png in api/static/team_flags/
 """
 # Czech long name (or common name) -> IIHF code (lowercase for filename)
 TEAM_NAME_TO_SHORTCUT = {

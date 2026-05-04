@@ -163,8 +163,22 @@ class Playoff(models.Model):
     ]
     
     playoff_type = models.CharField(max_length=4, choices=PLAYOFF_TYPES, db_index=True)
-    team_a = models.ForeignKey(Team, related_name='playoffs_as_team_a', on_delete=models.CASCADE, db_index=True)
-    team_b = models.ForeignKey(Team, related_name='playoffs_as_team_b', on_delete=models.CASCADE, db_index=True)
+    team_a = models.ForeignKey(
+        Team,
+        related_name='playoffs_as_team_a',
+        on_delete=models.CASCADE,
+        db_index=True,
+        null=True,
+        blank=True,
+    )
+    team_b = models.ForeignKey(
+        Team,
+        related_name='playoffs_as_team_b',
+        on_delete=models.CASCADE,
+        db_index=True,
+        null=True,
+        blank=True,
+    )
     score_a = models.IntegerField(blank=True, null=True)
     score_b = models.IntegerField(blank=True, null=True)
     score_a_final = models.IntegerField(blank=True, null=True)
@@ -183,9 +197,17 @@ class Playoff(models.Model):
             models.Index(fields=['cup', 'date']),
             models.Index(fields=['playoff_type']),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['cup', 'playoff_type'],
+                name='uniq_playoff_cup_playoff_type',
+            ),
+        ]
 
     def __str__(self):
-        return f'{self.playoff_type} - {self.team_a.name} vs {self.team_b.name}'
+        na = self.team_a.name if self.team_a_id else '?'
+        nb = self.team_b.name if self.team_b_id else '?'
+        return f'{self.playoff_type} - {na} vs {nb}'
 
 
 class MatchTip(models.Model):

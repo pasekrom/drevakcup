@@ -62,6 +62,17 @@ class SpecialTipAdmin(admin.ModelAdmin):
 class SpecialAdmin(admin.ModelAdmin):
     list_display = ['cup', 'winner', 'final_a', 'final_b']
     list_filter = ['cup']
+    readonly_fields = [
+        'winner',
+        'final_a',
+        'final_b',
+        'bronze_a',
+        'bronze_b',
+        'team_most_goals',
+        'team_least_goals',
+        'max_goals_per_game',
+        'overtimes',
+    ]
 
 
 @admin.register(UserPoint)

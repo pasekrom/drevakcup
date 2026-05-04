@@ -248,50 +248,132 @@
       <p v-if="matches.length === 0" class="py-4 text-gray-500">Žádné zápasy.</p>
     </div>
 
+    <!-- Play-off -->
+    <div class="card">
+      <h2 class="text-xl font-bold mb-2">Play-off</h2>
+      <p class="text-gray-600 text-sm mb-4">
+        Čtvrtfinále (4×), semifinále (2×), zápas o bronz a finále — u každého vyber týmy a později dopiš skóre.
+        Údaje <strong>finále, bronz a vítěz</strong> se po uložení skóre nebo „Přepočítat body“ doplní do výsledků speciálu (už je nevyplňuješ ručně ve speciálu).
+      </p>
+      <div v-if="playoffs.length === 0" class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          :disabled="ensuringPlayoffs"
+          class="btn btn-primary"
+          @click="ensurePlayoffs"
+        >
+          {{ ensuringPlayoffs ? 'Zakládám…' : 'Založit play-off zápasy' }}
+        </button>
+        <span class="text-sm text-gray-500">Vytvoří 8 řádků (QF → finále).</span>
+      </div>
+      <div v-else class="space-y-8">
+        <div v-for="group in playoffDisplayGroups" :key="group.title">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ group.title }}</h3>
+          <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="w-full min-w-[52rem] text-left text-sm">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="py-2 px-3 font-medium text-gray-600">Kód</th>
+                  <th class="py-2 px-3 font-medium text-gray-600">Datum</th>
+                  <th class="py-2 px-3 font-medium text-gray-600">Tým A</th>
+                  <th class="py-2 px-3 font-medium text-gray-600">Tým B</th>
+                  <th class="py-2 px-3 font-medium text-gray-600 text-center">Zákl.</th>
+                  <th class="py-2 px-3 font-medium text-gray-600 text-center">Konečný</th>
+                  <th class="py-2 px-3 font-medium text-gray-600 text-right w-px">Akce</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <template v-for="p in group.rows" :key="p.id">
+                  <tr v-if="playoffScores[p.id]">
+                    <td class="py-2 px-3 font-mono text-xs text-gray-500">{{ p.playoff_type }}</td>
+                    <td class="py-2 px-3">
+                      <input
+                        v-model="playoffScores[p.id].date"
+                        type="datetime-local"
+                        class="input py-1 text-sm min-w-[11rem]"
+                      />
+                    </td>
+                    <td class="py-2 px-3">
+                      <select v-model="playoffScores[p.id].team_a_id" class="input py-1 text-sm w-full max-w-[10rem]">
+                        <option :value="null">—</option>
+                        <option v-for="t in teams" :key="'pa-' + p.id + '-' + t.id" :value="t.id">{{ t.name }}</option>
+                      </select>
+                    </td>
+                    <td class="py-2 px-3">
+                      <select v-model="playoffScores[p.id].team_b_id" class="input py-1 text-sm w-full max-w-[10rem]">
+                        <option :value="null">—</option>
+                        <option v-for="t in teams" :key="'pb-' + p.id + '-' + t.id" :value="t.id">{{ t.name }}</option>
+                      </select>
+                    </td>
+                    <td class="py-2 px-3">
+                      <div class="flex items-center justify-center gap-1">
+                        <input
+                          v-model.number="playoffScores[p.id].score_a"
+                          type="number"
+                          min="0"
+                          class="input input-score w-12 text-center py-1"
+                        />
+                        <span class="text-gray-400">:</span>
+                        <input
+                          v-model.number="playoffScores[p.id].score_b"
+                          type="number"
+                          min="0"
+                          class="input input-score w-12 text-center py-1"
+                        />
+                      </div>
+                    </td>
+                    <td class="py-2 px-3">
+                      <div class="flex items-center justify-center gap-1">
+                        <input
+                          v-model.number="playoffScores[p.id].score_a_final"
+                          type="number"
+                          min="0"
+                          class="input input-score w-12 text-center py-1"
+                        />
+                        <span class="text-gray-400">:</span>
+                        <input
+                          v-model.number="playoffScores[p.id].score_b_final"
+                          type="number"
+                          min="0"
+                          class="input input-score w-12 text-center py-1"
+                        />
+                      </div>
+                    </td>
+                    <td class="py-2 px-3 text-right">
+                      <button
+                        type="button"
+                        class="btn btn-secondary text-xs py-1 px-2"
+                        :disabled="savingPlayoffId === p.id"
+                        @click="savePlayoffResult(p)"
+                      >
+                        {{ savingPlayoffId === p.id ? '…' : 'Uložit' }}
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Výsledky speciálních tipů -->
     <div class="card">
       <h2 class="text-xl font-bold mb-4">Výsledky speciálních tipů</h2>
-      <p class="text-gray-600 mb-4">Vyplňte skutečné výsledky turnaje, aby šly porovnat s tipy uživatelů.</p>
+      <p class="text-gray-600 mb-4">Vyplň skutečné výsledky (skupiny, čeští střelci, …). Finále, bronz a vítěz jdou z play-off výše.</p>
       <div v-if="specialLoading" class="py-4 text-gray-500">Načítání…</div>
       <form v-else @submit.prevent="saveSpecialResults" class="space-y-6">
         <div class="space-y-4">
-          <div>
-            <label class="label">Vítěz</label>
-            <select v-model="specialForm.winner_id" class="input w-full max-w-md">
-              <option :value="null">—</option>
-              <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-            </select>
-          </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="label">Finalista 1</label>
-              <select v-model="specialForm.final_a_id" class="input">
-                <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </select>
-            </div>
-            <div>
-              <label class="label">Finalista 2</label>
-              <select v-model="specialForm.final_b_id" class="input">
-                <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </select>
-            </div>
-          </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="label">Tým 1 o bronz</label>
-              <select v-model="specialForm.bronze_a_id" class="input">
-                <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </select>
-            </div>
-            <div>
-              <label class="label">Tým 2 o bronz</label>
-              <select v-model="specialForm.bronze_b_id" class="input">
-                <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </select>
+          <div class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 md:col-span-2">
+            <p class="text-sm font-medium text-gray-800">Z play-off → speciál (jen náhled)</p>
+            <p class="text-xs text-gray-600 mt-1 mb-3">
+              Po uložení řádku play-off nebo „Přepočítat body“ se sem promítnou GMG (finále), BMG (o bronz) a vítěz z finále.
+            </p>
+            <div class="grid sm:grid-cols-2 gap-3 text-sm">
+              <div><span class="text-gray-600">Vítěz:</span> <span class="ml-1 font-medium">{{ teamNameById(specialForm.winner_id) }}</span></div>
+              <div><span class="text-gray-600">Finále:</span> <span class="ml-1 font-medium">{{ teamNameById(specialForm.final_a_id) }}</span> vs <span class="font-medium">{{ teamNameById(specialForm.final_b_id) }}</span></div>
+              <div><span class="text-gray-600">O bronz:</span> <span class="ml-1 font-medium">{{ teamNameById(specialForm.bronze_a_id) }}</span> vs <span class="font-medium">{{ teamNameById(specialForm.bronze_b_id) }}</span></div>
             </div>
           </div>
           <div class="grid md:grid-cols-2 gap-4">
@@ -304,14 +386,28 @@
               <input v-model="specialForm.czech_shooter_last" type="text" class="input" />
             </div>
           </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="label">Nejvíce branek v jednom utkání</label>
-              <input v-model.number="specialForm.max_goals_per_game" type="number" min="0" class="input" />
-            </div>
-            <div>
-              <label class="label">Počet remíz/prodloužení</label>
-              <input v-model.number="specialForm.overtimes" type="number" min="0" class="input" />
+          <div class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 md:col-span-2">
+            <p class="text-sm font-medium text-gray-800">Zápasy → dopočet (neupravuješ ručně)</p>
+            <p class="text-xs text-gray-600 mt-1 mb-3">
+              Po uložení skóre zápasu nebo tlačítku „Přepočítat body“ se z tabulky týmů a výsledků doplní tyto údaje do výsledků speciálu.
+            </p>
+            <div class="grid sm:grid-cols-2 gap-3 text-sm">
+              <div>
+                <span class="text-gray-600">Nejvíce branek v jednom utkání:</span>
+                <span class="ml-1 font-semibold tabular-nums">{{ specialForm.max_goals_per_game ?? '—' }}</span>
+              </div>
+              <div>
+                <span class="text-gray-600">Remízy / prodloužení (počet):</span>
+                <span class="ml-1 font-semibold tabular-nums">{{ specialForm.overtimes ?? '—' }}</span>
+              </div>
+              <div>
+                <span class="text-gray-600">Tým – nejvíce vstřelených:</span>
+                <span class="ml-1 font-medium">{{ teamNameById(specialForm.team_most_goals_id) }}</span>
+              </div>
+              <div>
+                <span class="text-gray-600">Tým – nejméně obdržených:</span>
+                <span class="ml-1 font-medium">{{ teamNameById(specialForm.team_least_goals_id) }}</span>
+              </div>
             </div>
           </div>
           <div class="grid md:grid-cols-2 gap-6">
@@ -355,20 +451,6 @@
             </div>
           </div>
           <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="label">Tým – nejvíce branek</label>
-              <select v-model="specialForm.team_most_goals_id" class="input">
-                <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </select>
-            </div>
-            <div>
-              <label class="label">Tým – nejméně obdržených</label>
-              <select v-model="specialForm.team_least_goals_id" class="input">
-                <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </select>
-            </div>
             <div>
               <label class="label">Tým – první branka MS</label>
               <select v-model="specialForm.team_first_goal_id" class="input">
@@ -418,7 +500,29 @@ const editForm = reactive({ year: '', location: '', date_start: '', date_end: ''
 const teamForm = reactive({ name: '', group: 'A' })
 const matchForm = reactive({ team_a_id: null, team_b_id: null, date: '' })
 const matchScores = ref({})
+const playoffs = ref([])
+const playoffScores = ref({})
+const ensuringPlayoffs = ref(false)
+const savingPlayoffId = ref(null)
 const groupLabels = ['1. místo', '2. místo', '3. místo', '4. místo']
+
+const PLAYOFF_GROUPS = [
+  { title: 'Čtvrtfinále (4 zápasy)', types: ['QFA1', 'QFA2', 'QFB1', 'QFB2'] },
+  { title: 'Semifinále', types: ['SFA', 'SFB'] },
+  { title: 'O bronz', types: ['BMG'] },
+  { title: 'Finále', types: ['GMG'] },
+]
+
+const playoffDisplayGroups = computed(() => {
+  const byType = {}
+  for (const p of playoffs.value) {
+    byType[p.playoff_type] = p
+  }
+  return PLAYOFF_GROUPS.map((g) => ({
+    title: g.title,
+    rows: g.types.map((t) => byType[t]).filter(Boolean),
+  })).filter((g) => g.rows.length > 0)
+})
 
 const groupATeams = computed(() => teams.value.filter((t) => t.group === 'A'))
 const groupBTeams = computed(() => teams.value.filter((t) => t.group === 'B'))
@@ -480,18 +584,123 @@ function formatDateTime(d) {
   return new Date(d).toLocaleString('cs-CZ')
 }
 
+function toLocalDatetime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function rebuildPlayoffScores() {
+  const next = {}
+  for (const p of playoffs.value) {
+    next[p.id] = {
+      team_a_id: p.team_a?.id ?? null,
+      team_b_id: p.team_b?.id ?? null,
+      score_a: p.score_a != null && p.score_a !== '' ? Number(p.score_a) : '',
+      score_b: p.score_b != null && p.score_b !== '' ? Number(p.score_b) : '',
+      score_a_final:
+        p.score_a_final != null && p.score_a_final !== ''
+          ? Number(p.score_a_final)
+          : p.score_a != null && p.score_a !== ''
+            ? Number(p.score_a)
+            : '',
+      score_b_final:
+        p.score_b_final != null && p.score_b_final !== ''
+          ? Number(p.score_b_final)
+          : p.score_b != null && p.score_b !== ''
+            ? Number(p.score_b)
+            : '',
+      date: toLocalDatetime(p.date),
+    }
+  }
+  playoffScores.value = next
+}
+
+async function ensurePlayoffs() {
+  if (!cup.value?.id) return
+  ensuringPlayoffs.value = true
+  try {
+    const res = await api.post('/playoffs/ensure/', { cup_id: cup.value.id })
+    playoffs.value = res.data.playoffs ?? []
+    rebuildPlayoffScores()
+    await loadSpecial()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    ensuringPlayoffs.value = false
+  }
+}
+
+async function savePlayoffResult(p) {
+  savingPlayoffId.value = p.id
+  try {
+    const s = playoffScores.value[p.id]
+    const scoreA = s.score_a === '' || s.score_a === undefined ? null : Number(s.score_a)
+    const scoreB = s.score_b === '' || s.score_b === undefined ? null : Number(s.score_b)
+    let scoreAFinal = s.score_a_final === '' || s.score_a_final === undefined ? null : Number(s.score_a_final)
+    let scoreBFinal = s.score_b_final === '' || s.score_b_final === undefined ? null : Number(s.score_b_final)
+    if (scoreAFinal == null && scoreA != null) scoreAFinal = scoreA
+    if (scoreBFinal == null && scoreB != null) scoreBFinal = scoreB
+    const payload = {
+      team_a_id: s.team_a_id ?? null,
+      team_b_id: s.team_b_id ?? null,
+      score_a: scoreA,
+      score_b: scoreB,
+      score_a_final: scoreAFinal,
+      score_b_final: scoreBFinal,
+    }
+    if (s.date) payload.date = new Date(s.date).toISOString()
+    const res = await api.patch(`/playoffs/${p.id}/`, payload)
+    const idx = playoffs.value.findIndex((x) => x.id === p.id)
+    if (idx !== -1) playoffs.value[idx] = res.data
+    const pr = res.data
+    playoffScores.value[p.id] = {
+      team_a_id: pr.team_a?.id ?? null,
+      team_b_id: pr.team_b?.id ?? null,
+      score_a: pr.score_a != null ? Number(pr.score_a) : '',
+      score_b: pr.score_b != null ? Number(pr.score_b) : '',
+      score_a_final:
+        pr.score_a_final != null
+          ? Number(pr.score_a_final)
+          : pr.score_a != null
+            ? Number(pr.score_a)
+            : '',
+      score_b_final:
+        pr.score_b_final != null
+          ? Number(pr.score_b_final)
+          : pr.score_b != null
+            ? Number(pr.score_b)
+            : '',
+      date: toLocalDatetime(pr.date),
+    }
+    const teamsRes = await api.get(`/teams/?cup=${cup.value.id}`)
+    teams.value = teamsRes.data.results ?? teamsRes.data
+    await loadSpecial()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    savingPlayoffId.value = null
+  }
+}
+
 async function load() {
   const id = route.params.id
   try {
-    const [cupRes, teamsRes, matchesRes] = await Promise.all([
+    const [cupRes, teamsRes, matchesRes, playoffsRes] = await Promise.all([
       api.get(`/cups/${id}/`),
       api.get(`/teams/?cup=${id}`),
       api.get(`/matches/?cup=${id}`),
+      api.get(`/playoffs/?cup=${id}`),
     ])
     cup.value = cupRes.data
     teams.value = Array.isArray(teamsRes.data) ? teamsRes.data : (teamsRes.data?.results ?? [])
     const matchList = Array.isArray(matchesRes.data) ? matchesRes.data : (matchesRes.data?.results ?? [])
     matches.value = matchList
+    const plist = Array.isArray(playoffsRes.data) ? playoffsRes.data : (playoffsRes.data?.results ?? [])
+    playoffs.value = plist
+    rebuildPlayoffScores()
     editForm.year = cup.value.year
     editForm.location = cup.value.location || ''
     editForm.date_start = cup.value.date_start ? cup.value.date_start.slice(0, 10) : ''
@@ -627,6 +836,7 @@ async function saveMatchResult(m) {
     // Backend recalculates points automatically; refresh teams table
     const teamsRes = await api.get(`/teams/?cup=${cup.value.id}`)
     teams.value = teamsRes.data.results ?? teamsRes.data
+    await loadSpecial()
   } catch (e) {
     console.error(e)
   } finally {
@@ -637,6 +847,12 @@ async function saveMatchResult(m) {
 function teamIdFromApi(value) {
   if (value == null) return null
   return typeof value === 'object' && value !== null && 'id' in value ? value.id : value
+}
+
+function teamNameById(id) {
+  if (id == null) return '—'
+  const t = teams.value.find((x) => x.id === id)
+  return t?.name ?? `—`
 }
 
 async function loadSpecial() {
@@ -680,15 +896,8 @@ function specialPayload() {
   const f = specialForm
   return {
     cup_id: cup.value.id,
-    winner: f.winner_id || null,
-    final_a: f.final_a_id || null,
-    final_b: f.final_b_id || null,
-    bronze_a: f.bronze_a_id || null,
-    bronze_b: f.bronze_b_id || null,
     czech_shooter_first: f.czech_shooter_first || '',
     czech_shooter_last: f.czech_shooter_last || '',
-    max_goals_per_game: f.max_goals_per_game ?? null,
-    overtimes: f.overtimes ?? null,
     group_a_1: f.group_a_1_id || null,
     group_a_2: f.group_a_2_id || null,
     group_a_3: f.group_a_3_id || null,
@@ -699,8 +908,6 @@ function specialPayload() {
     group_b_4: f.group_b_4_id || null,
     team_drop_a: f.team_drop_a_id || null,
     team_drop_b: f.team_drop_b_id || null,
-    team_most_goals: f.team_most_goals_id || null,
-    team_least_goals: f.team_least_goals_id || null,
     team_first_goal: f.team_first_goal_id || null,
     team_last_goal: f.team_last_goal_id || null,
   }
@@ -710,6 +917,7 @@ async function saveSpecialResults() {
   savingSpecial.value = true
   try {
     await api.put(`/special/by_cup/?cup=${cup.value.id}`, specialPayload())
+    await loadSpecial()
   } catch (e) {
     console.error(e)
   } finally {
