@@ -17,15 +17,34 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me-in-production')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-# CSRF: allow frontend origin (Django 4.0+)
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()
 ]
+
+
+def _split_origins(env_key, defaults):
+    """Čárkou oddělené URL se schématem (např. https://example.cz)."""
+    raw = os.getenv(env_key, '').strip()
+    extra = [o.strip() for o in raw.split(',') if o.strip()]
+    seen = set()
+    out = []
+    for o in defaults + extra:
+        if o not in seen:
+            seen.add(o)
+            out.append(o)
+    return out
+
+
+# CSRF: musí obsahovat přesný Origin prohlížeče (schéma + host, bez cesty) — jinak POST/login selže v produkci.
+CSRF_TRUSTED_ORIGINS = _split_origins(
+    'CSRF_TRUSTED_ORIGINS',
+    [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ],
+)
 
 
 # Application definition
@@ -151,13 +170,16 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite default port
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000",
-]
+# CORS: v produkci doplň stejnou veřejnou URL frontendu jako v CSRF_TRUSTED_ORIGINS (proměnná CORS_ALLOWED_ORIGINS).
+CORS_ALLOWED_ORIGINS = _split_origins(
+    'CORS_ALLOWED_ORIGINS',
+    [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:3000',
+    ],
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
