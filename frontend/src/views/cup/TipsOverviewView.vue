@@ -312,7 +312,9 @@ function foldText(value) {
 
 function teamName(id) {
   if (id == null) return '—'
-  return teamsById.value.get(id)?.name ?? '—'
+  const t = teamsById.value.get(id)
+  if (!t) return '—'
+  return t.display_name || t.name || '—'
 }
 
 function formatSpecialResult(row, sr) {

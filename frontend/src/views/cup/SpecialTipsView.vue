@@ -55,7 +55,7 @@
                   >
                     <option :value="null">Vyberte tým</option>
                     <option v-for="team in teamsForSelect(row)" :key="team.id" :value="team.id">
-                      {{ team.name }}
+                      {{ team.display_name || team.name }}
                     </option>
                   </select>
                   <input

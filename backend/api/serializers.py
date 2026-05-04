@@ -63,11 +63,12 @@ class TeamSerializer(serializers.ModelSerializer):
     cup_id = serializers.IntegerField(write_only=True)
     flag_url = serializers.SerializerMethodField()
     shortcut = serializers.SerializerMethodField()
-    
+    display_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Team
         fields = [
-            'id', 'name', 'shortcut', 'flag', 'flag_url', 'gp', 'win', 'los', 'wot', 'lot',
+            'id', 'name', 'display_name', 'shortcut', 'flag', 'flag_url', 'gp', 'win', 'los', 'wot', 'lot',
             'gf', 'ga', 'points', 'year', 'group', 'cup', 'cup_id'
         ]
         read_only_fields = ['id']
@@ -89,7 +90,12 @@ class TeamSerializer(serializers.ModelSerializer):
         from .team_flags import get_team_flag_shortcut
         code = get_team_flag_shortcut(obj.name)
         return code.upper() if code else None
-    
+
+    def get_display_name(self, obj):
+        from .team_flags import get_team_display_label
+
+        return get_team_display_label(obj.name)
+
     def get_flag_url(self, obj):
         from .flag_urls import public_or_request_url
         from .team_flags import get_team_flag_shortcut

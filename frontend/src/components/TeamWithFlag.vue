@@ -3,7 +3,7 @@
     <img
       v-if="team?.flag_url"
       :src="team.flag_url"
-      :alt="team?.name"
+      :alt="team?.display_name || team?.name"
       class="w-6 h-4 object-contain rounded flex-shrink-0"
       loading="lazy"
     />
@@ -38,6 +38,6 @@ const labelText = computed(() => {
   if (props.display === 'shortcut') {
     return t.shortcut || t.name || '—'
   }
-  return t.name || t.shortcut || '—'
+  return t.display_name || t.name || t.shortcut || '—'
 })
 </script>

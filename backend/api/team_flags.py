@@ -88,6 +88,47 @@ IIHF_CODE_TO_FILE = {
     'BLR': 'blr',
 }
 
+# Zobrazení v UI, když je v DB jen třípísmenný kód (FIN, CZE, …)
+IIHF_CODE_TO_DISPLAY_CZ = {
+    'CZE': 'Česko',
+    'SVK': 'Slovensko',
+    'SUI': 'Švýcarsko',
+    'FIN': 'Finsko',
+    'USA': 'USA',
+    'SWE': 'Švédsko',
+    'LAT': 'Lotyšsko',
+    'CAN': 'Kanada',
+    'GER': 'Německo',
+    'AUT': 'Rakousko',
+    'NOR': 'Norsko',
+    'DEN': 'Dánsko',
+    'FRA': 'Francie',
+    'ITA': 'Itálie',
+    'KAZ': 'Kazachstán',
+    'POL': 'Polsko',
+    'UKR': 'Ukrajina',
+    'GBR': 'Velká Británie',
+    'SVN': 'Slovinsko',
+    'HUN': 'Maďarsko',
+    'JPN': 'Japonsko',
+    'KOR': 'Jižní Korea',
+    'CHN': 'Čína',
+    'RUS': 'Rusko',
+    'BLR': 'Bělorusko',
+}
+
+
+def get_team_display_label(team_name: str) -> str:
+    """Český dlouhý název pro známý třípísmenný kód; jinak vrátí původní řetězec z DB."""
+    if not team_name or not isinstance(team_name, str):
+        return team_name or ''
+    s = team_name.strip()
+    if not s:
+        return ''
+    if len(s) == 3 and s.isalpha():
+        return IIHF_CODE_TO_DISPLAY_CZ.get(s.upper(), s)
+    return s
+
 
 # Normalize for lookup: strip whitespace, optional case-insensitive
 def get_team_flag_shortcut(team_name):

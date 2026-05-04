@@ -145,6 +145,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
+# URL vždy začíná /static/… — v nginx musí být location /static/ (ne jen /static/django/), viz deploy/nginx-site.example.conf
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 

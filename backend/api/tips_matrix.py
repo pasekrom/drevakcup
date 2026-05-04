@@ -7,6 +7,7 @@ from django.templatetags.static import static as django_static
 
 from .flag_urls import public_or_request_url
 from .models import Cup, Match, MatchTip, Special, SpecialTip, Team, User, UserPoint
+from .team_flags import get_team_display_label
 from .services import is_tournament_started
 
 
@@ -82,6 +83,7 @@ def _team_dict_for_matrix(team: Team, request) -> dict:
     return {
         'id': team.id,
         'name': team.name,
+        'display_name': get_team_display_label(team.name),
         'shortcut': code_upper,
         'flag_url': flag_url,
     }
@@ -210,7 +212,14 @@ def build_tips_matrix(cup: Cup, request=None) -> dict:
             }
         )
 
-    teams_payload = list(Team.objects.filter(cup=cup).values('id', 'name'))
+    teams_payload = [
+        {
+            'id': t.id,
+            'name': t.name,
+            'display_name': get_team_display_label(t.name),
+        }
+        for t in Team.objects.filter(cup=cup)
+    ]
 
     return {
         'cup_id': cup.id,

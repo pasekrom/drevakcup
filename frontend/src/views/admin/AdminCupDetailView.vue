@@ -152,14 +152,14 @@
             <label class="label">Tým A</label>
             <select v-model.number="matchForm.team_a_id" required class="input">
               <option :value="null">— vyberte —</option>
-              <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
+              <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
             </select>
           </div>
           <div>
             <label class="label">Tým B</label>
             <select v-model.number="matchForm.team_b_id" required class="input">
               <option :value="null">— vyberte —</option>
-              <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
+              <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
             </select>
           </div>
         </div>
@@ -296,13 +296,13 @@
                     <td class="py-2 px-3">
                       <select v-model="playoffScores[p.id].team_a_id" class="input py-1 text-sm w-full max-w-[10rem]">
                         <option :value="null">—</option>
-                        <option v-for="t in teams" :key="'pa-' + p.id + '-' + t.id" :value="t.id">{{ t.name }}</option>
+                        <option v-for="t in teams" :key="'pa-' + p.id + '-' + t.id" :value="t.id">{{ t.display_name || t.name }}</option>
                       </select>
                     </td>
                     <td class="py-2 px-3">
                       <select v-model="playoffScores[p.id].team_b_id" class="input py-1 text-sm w-full max-w-[10rem]">
                         <option :value="null">—</option>
-                        <option v-for="t in teams" :key="'pb-' + p.id + '-' + t.id" :value="t.id">{{ t.name }}</option>
+                        <option v-for="t in teams" :key="'pb-' + p.id + '-' + t.id" :value="t.id">{{ t.display_name || t.name }}</option>
                       </select>
                     </td>
                     <td class="py-2 px-3">
@@ -418,14 +418,14 @@
                   <label class="label">{{ label }}</label>
                   <select v-model="specialForm[`group_a_${i + 1}_id`]" class="input w-full">
                     <option :value="null">—</option>
-                    <option v-for="t in groupATeams" :key="t.id" :value="t.id">{{ t.name }}</option>
+                    <option v-for="t in groupATeams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
                   </select>
                 </div>
                 <div>
                   <label class="label">Sestup</label>
                   <select v-model="specialForm.team_drop_a_id" class="input w-full">
                     <option :value="null">—</option>
-                    <option v-for="t in groupATeams" :key="t.id" :value="t.id">{{ t.name }}</option>
+                    <option v-for="t in groupATeams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
                   </select>
                 </div>
               </div>
@@ -437,14 +437,14 @@
                   <label class="label">{{ label }}</label>
                   <select v-model="specialForm[`group_b_${i + 1}_id`]" class="input w-full">
                     <option :value="null">—</option>
-                    <option v-for="t in groupBTeams" :key="t.id" :value="t.id">{{ t.name }}</option>
+                    <option v-for="t in groupBTeams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
                   </select>
                 </div>
                 <div>
                   <label class="label">Sestup</label>
                   <select v-model="specialForm.team_drop_b_id" class="input w-full">
                     <option :value="null">—</option>
-                    <option v-for="t in groupBTeams" :key="t.id" :value="t.id">{{ t.name }}</option>
+                    <option v-for="t in groupBTeams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
                   </select>
                 </div>
               </div>
@@ -455,14 +455,14 @@
               <label class="label">Tým – první branka MS</label>
               <select v-model="specialForm.team_first_goal_id" class="input">
                 <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
+                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
               </select>
             </div>
             <div>
               <label class="label">Tým – poslední branka MS</label>
               <select v-model="specialForm.team_last_goal_id" class="input">
                 <option :value="null">—</option>
-                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.name }}</option>
+                <option v-for="t in teams" :key="t.id" :value="t.id">{{ t.display_name || t.name }}</option>
               </select>
             </div>
           </div>
@@ -852,7 +852,7 @@ function teamIdFromApi(value) {
 function teamNameById(id) {
   if (id == null) return '—'
   const t = teams.value.find((x) => x.id === id)
-  return t?.name ?? `—`
+  return t?.display_name || t?.name || '—'
 }
 
 async function loadSpecial() {
