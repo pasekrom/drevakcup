@@ -210,7 +210,7 @@ function matchResultText(m) {
   if (a == null || b == null) return null
   let s = `${a} : ${b}`
   if (m.overtime || (m.score_a != null && m.score_a_final != null && (m.score_a !== m.score_a_final || m.score_b !== m.score_b_final))) {
-    s += ' p'
+    s += m.shootout ? ' nájezdy' : ' prodloužení'
   }
   return s
 }

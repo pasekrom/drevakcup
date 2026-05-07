@@ -68,78 +68,80 @@
         <button type="button" @click="showTeamForm = false" class="btn btn-secondary">Zrušit</button>
       </form>
       <button v-else @click="showTeamForm = true" class="btn btn-primary mb-4">Přidat tým</button>
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              class="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('name')"
-            >
-              Tým {{ sortTeamsBy === 'name' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('group')"
-            >
-              Skupina {{ sortTeamsBy === 'group' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('gp')"
-            >
-              Z {{ sortTeamsBy === 'gp' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('win')"
-            >
-              V {{ sortTeamsBy === 'win' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('los')"
-            >
-              P {{ sortTeamsBy === 'los' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('gf')"
-            >
-              GV {{ sortTeamsBy === 'gf' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('ga')"
-            >
-              GO {{ sortTeamsBy === 'ga' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th
-              class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
-              @click="setTeamsSort('points')"
-            >
-              Body {{ sortTeamsBy === 'points' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
-            </th>
-            <th class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase">Akce</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="t in sortedTeams" :key="t.id">
-            <td class="px-6 py-2"><TeamWithFlag :team="t" /></td>
-            <td class="px-6 py-2">{{ t.group }}</td>
-            <td class="px-6 py-2 text-right">{{ t.gp ?? 0 }}</td>
-            <td class="px-6 py-2 text-right">{{ t.win ?? 0 }}</td>
-            <td class="px-6 py-2 text-right">{{ t.los ?? 0 }}</td>
-            <td class="px-6 py-2 text-right">{{ t.gf ?? 0 }}</td>
-            <td class="px-6 py-2 text-right">{{ t.ga ?? 0 }}</td>
-            <td class="px-6 py-2 text-right font-medium">{{ t.points ?? 0 }}</td>
-            <td class="px-6 py-2 text-right">
-              <button type="button" @click="deleteTeam(t.id)" class="text-red-600 hover:underline text-sm">
-                Smazat
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="-mx-4 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
+        <table class="min-w-[44rem] w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('name')"
+              >
+                Tým {{ sortTeamsBy === 'name' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('group')"
+              >
+                Skupina {{ sortTeamsBy === 'group' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('gp')"
+              >
+                Z {{ sortTeamsBy === 'gp' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('win')"
+              >
+                V {{ sortTeamsBy === 'win' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('los')"
+              >
+                P {{ sortTeamsBy === 'los' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('gf')"
+              >
+                GV {{ sortTeamsBy === 'gf' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('ga')"
+              >
+                GO {{ sortTeamsBy === 'ga' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th
+                class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none"
+                @click="setTeamsSort('points')"
+              >
+                Body {{ sortTeamsBy === 'points' ? (teamsSortDir === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th class="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase">Akce</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="t in sortedTeams" :key="t.id">
+              <td class="px-6 py-2 whitespace-nowrap"><TeamWithFlag :team="t" /></td>
+              <td class="px-6 py-2 whitespace-nowrap">{{ t.group }}</td>
+              <td class="px-6 py-2 text-right whitespace-nowrap">{{ t.gp ?? 0 }}</td>
+              <td class="px-6 py-2 text-right whitespace-nowrap">{{ t.win ?? 0 }}</td>
+              <td class="px-6 py-2 text-right whitespace-nowrap">{{ t.los ?? 0 }}</td>
+              <td class="px-6 py-2 text-right whitespace-nowrap">{{ t.gf ?? 0 }}</td>
+              <td class="px-6 py-2 text-right whitespace-nowrap">{{ t.ga ?? 0 }}</td>
+              <td class="px-6 py-2 text-right font-medium whitespace-nowrap">{{ t.points ?? 0 }}</td>
+              <td class="px-6 py-2 text-right whitespace-nowrap">
+                <button type="button" @click="deleteTeam(t.id)" class="text-red-600 hover:underline text-sm">
+                  Smazat
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p v-if="teams.length === 0" class="py-4 text-gray-500">Žádné týmy. Přidejte týmy před přidáním zápasů.</p>
     </div>
 
@@ -173,78 +175,90 @@
         </div>
       </form>
       <button v-else @click="showMatchForm = true" class="btn btn-primary mb-4">Přidat zápas</button>
-      <table class="admin-matches-table min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Zápas</th>
-            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Zákl.</th>
-            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Konečný</th>
-            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Akce</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="m in matches" :key="m.id">
-            <td class="px-4 py-2 whitespace-nowrap text-sm">{{ formatDateTime(m.date) }}</td>
-            <td class="px-4 py-2">
-              <TeamWithFlag :team="m.team_a" /> – <TeamWithFlag :team="m.team_b" />
-            </td>
-            <td class="px-4 py-2">
-              <div class="flex items-center justify-center gap-1">
+      <div class="-mx-4 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
+        <table class="admin-matches-table min-w-[56rem] w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Zápas</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Zákl.</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Konečný</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Nájezdy</th>
+              <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Akce</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="m in matches" :key="m.id">
+              <td class="px-4 py-2 whitespace-nowrap text-sm">{{ formatDateTime(m.date) }}</td>
+              <td class="px-4 py-2 whitespace-nowrap">
+                <TeamWithFlag :team="m.team_a" /> – <TeamWithFlag :team="m.team_b" />
+              </td>
+              <td class="px-4 py-2">
+                <div class="flex items-center justify-center gap-1">
+                  <input
+                    v-model.number="matchScores[m.id].score_a"
+                    type="number"
+                    min="0"
+                    class="input input-score w-14 min-w-[3rem] text-center"
+                    placeholder="0"
+                  />
+                  <span class="text-gray-500">:</span>
+                  <input
+                    v-model.number="matchScores[m.id].score_b"
+                    type="number"
+                    min="0"
+                    class="input input-score w-14 min-w-[3rem] text-center"
+                    placeholder="0"
+                  />
+                </div>
+              </td>
+              <td class="px-4 py-2">
+                <div class="flex items-center justify-center gap-1">
+                  <input
+                    v-model.number="matchScores[m.id].score_a_final"
+                    type="number"
+                    min="0"
+                    class="input input-score w-14 min-w-[3rem] text-center"
+                    placeholder="0"
+                  />
+                  <span class="text-gray-500">:</span>
+                  <input
+                    v-model.number="matchScores[m.id].score_b_final"
+                    type="number"
+                    min="0"
+                    class="input input-score w-14 min-w-[3rem] text-center"
+                    placeholder="0"
+                  />
+                </div>
+              </td>
+              <td class="px-4 py-2 text-center">
                 <input
-                  v-model.number="matchScores[m.id].score_a"
-                  type="number"
-                  min="0"
-                  class="input input-score w-14 min-w-[3rem] text-center"
-                  placeholder="0"
-                />
-                <span class="text-gray-500">:</span>
-                <input
-                  v-model.number="matchScores[m.id].score_b"
-                  type="number"
-                  min="0"
-                  class="input input-score w-14 min-w-[3rem] text-center"
-                  placeholder="0"
-                />
-              </div>
-            </td>
-            <td class="px-4 py-2">
-              <div class="flex items-center justify-center gap-1">
-                <input
-                  v-model.number="matchScores[m.id].score_a_final"
-                  type="number"
-                  min="0"
-                  class="input input-score w-14 min-w-[3rem] text-center"
-                  placeholder="0"
-                />
-                <span class="text-gray-500">:</span>
-                <input
-                  v-model.number="matchScores[m.id].score_b_final"
-                  type="number"
-                  min="0"
-                  class="input input-score w-14 min-w-[3rem] text-center"
-                  placeholder="0"
-                />
-              </div>
-            </td>
-            <td class="px-4 py-2 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <button
-                  type="button"
+                  v-model="matchScores[m.id].shootout"
+                  type="checkbox"
+                  class="h-4 w-4 accent-primary-600"
                   :disabled="savingMatchId === m.id"
-                  class="btn btn-secondary text-sm py-1 px-2"
-                  @click="saveMatchResult(m)"
-                >
-                  {{ savingMatchId === m.id ? '…' : 'Uložit' }}
-                </button>
-                <button type="button" @click="deleteMatch(m.id)" class="text-red-600 hover:underline text-sm">
-                  Smazat
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                  :title="'Zaškrtni, pokud byl zápas rozhodnut na nájezdy (konečné skóre je pak po nájezdech).'"
+                />
+              </td>
+              <td class="px-4 py-2 text-right whitespace-nowrap">
+                <div class="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    :disabled="savingMatchId === m.id"
+                    class="btn btn-secondary text-sm py-1 px-2"
+                    @click="saveMatchResult(m)"
+                  >
+                    {{ savingMatchId === m.id ? '…' : 'Uložit' }}
+                  </button>
+                  <button type="button" @click="deleteMatch(m.id)" class="text-red-600 hover:underline text-sm">
+                    Smazat
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p v-if="matches.length === 0" class="py-4 text-gray-500">Žádné zápasy.</p>
     </div>
 
@@ -279,6 +293,7 @@
                   <th class="py-2 px-3 font-medium text-gray-600">Tým B</th>
                   <th class="py-2 px-3 font-medium text-gray-600 text-center">Zákl.</th>
                   <th class="py-2 px-3 font-medium text-gray-600 text-center">Konečný</th>
+                  <th class="py-2 px-3 font-medium text-gray-600 text-center whitespace-nowrap">Nájezdy</th>
                   <th class="py-2 px-3 font-medium text-gray-600 text-right w-px">Akce</th>
                 </tr>
               </thead>
@@ -338,6 +353,15 @@
                           class="input input-score w-12 text-center py-1"
                         />
                       </div>
+                    </td>
+                    <td class="py-2 px-3 text-center">
+                      <input
+                        v-model="playoffScores[p.id].shootout"
+                        type="checkbox"
+                        class="h-4 w-4 accent-primary-600"
+                        :disabled="savingPlayoffId === p.id"
+                        :title="'Zaškrtni, pokud byl zápas rozhodnut na nájezdy (konečné skóre je pak po nájezdech).'"
+                      />
                     </td>
                     <td class="py-2 px-3 text-right">
                       <button
@@ -613,6 +637,7 @@ function rebuildPlayoffScores() {
             ? Number(p.score_b)
             : '',
       date: toLocalDatetime(p.date),
+      shootout: !!p.shootout,
     }
   }
   playoffScores.value = next
@@ -650,6 +675,7 @@ async function savePlayoffResult(p) {
       score_b: scoreB,
       score_a_final: scoreAFinal,
       score_b_final: scoreBFinal,
+      shootout: !!s.shootout,
     }
     if (s.date) payload.date = new Date(s.date).toISOString()
     const res = await api.patch(`/playoffs/${p.id}/`, payload)
@@ -713,6 +739,7 @@ async function load() {
         score_b: toScore(m.score_b),
         score_a_final: toScore(m.score_a_final != null ? m.score_a_final : m.score_a),
         score_b_final: toScore(m.score_b_final != null ? m.score_b_final : m.score_b),
+      shootout: !!m.shootout,
       }
     }
     matchScores.value = byId
@@ -789,7 +816,10 @@ async function addMatch() {
       date: new Date(matchForm.date).toISOString(),
     })
     matches.value.push(res.data)
-    matchScores.value = { ...matchScores.value, [res.data.id]: { score_a: '', score_b: '', score_a_final: '', score_b_final: '' } }
+    matchScores.value = {
+      ...matchScores.value,
+      [res.data.id]: { score_a: '', score_b: '', score_a_final: '', score_b_final: '', shootout: false },
+    }
     matchForm.team_a_id = null
     matchForm.team_b_id = null
     matchForm.date = ''
@@ -829,6 +859,7 @@ async function saveMatchResult(m) {
       score_b: scoreB,
       score_a_final: scoreAFinal,
       score_b_final: scoreBFinal,
+      shootout: !!s.shootout,
     }
     const res = await api.patch(`/matches/${m.id}/`, payload)
     const idx = matches.value.findIndex((x) => x.id === m.id)

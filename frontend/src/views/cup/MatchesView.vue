@@ -30,7 +30,9 @@
               <p class="text-lg font-bold tabular-nums">
                 <template v-if="finalScore(match) != null">
                   {{ finalScore(match).a }} : {{ finalScore(match).b }}
-                  <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-600 ml-1">OT</span>
+                  <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-700 ml-2">
+                    {{ extraTimeLabel(match) }}
+                  </span>
                 </template>
                 <span v-else class="text-gray-400 font-normal">– : –</span>
               </p>
@@ -95,7 +97,9 @@
               <td class="py-2.5 px-4 text-lg font-bold tabular-nums">
                 <template v-if="finalScore(match) != null">
                   {{ finalScore(match).a }} : {{ finalScore(match).b }}
-                  <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-600 ml-1">OT</span>
+                  <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-700 ml-2">
+                    {{ extraTimeLabel(match) }}
+                  </span>
                 </template>
                 <span v-else class="text-gray-400 font-normal">– : –</span>
               </td>
@@ -210,6 +214,10 @@ function isToday(dateString) {
   const d = new Date(dateString)
   const now = new Date()
   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
+}
+
+function extraTimeLabel(match) {
+  return match?.shootout ? 'nájezdy' : 'prodloužení'
 }
 
 function finalScore(match) {

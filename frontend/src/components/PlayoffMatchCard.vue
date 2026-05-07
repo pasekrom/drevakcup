@@ -23,7 +23,9 @@
         <span v-if="fs" class="tabular-nums font-bold text-gray-900 shrink-0">{{ fs.b }}</span>
         <span v-else class="text-gray-300 text-sm">–</span>
       </div>
-      <div v-if="fs && ot" class="text-[10px] text-amber-600 font-medium">Po prodloužení / nájezdy</div>
+      <div v-if="fs && ot" class="text-[10px] text-amber-700 font-medium">
+        {{ playoff?.shootout ? 'Nájezdy' : 'Prodloužení' }}
+      </div>
       <div class="text-[10px] text-gray-500 pt-0.5 border-t border-gray-100">{{ shortDate }}</div>
     </div>
   </div>

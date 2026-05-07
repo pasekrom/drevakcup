@@ -128,10 +128,19 @@ def build_tips_matrix(cup: Cup, request=None) -> dict:
     )
     points_a = {up.user_id: up.points for up in UserPoint.objects.filter(cup=cup, part='A')}
     points_b = {up.user_id: up.points for up in UserPoint.objects.filter(cup=cup, part='B')}
+    def _display_name(u: User) -> str:
+        name = (u.name or '').strip()
+        if name:
+            return name
+        email = (u.email or '').strip()
+        if not email:
+            return ''
+        return email.split('@', 1)[0] or email
+
     user_payload = [
         {
             'id': u.id,
-            'display_name': (u.name or '').strip() or u.email,
+            'display_name': _display_name(u),
             'points_part_a': points_a.get(u.id, 0),
             'points_part_b': points_b.get(u.id, 0),
         }

@@ -30,7 +30,13 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.avatar.url
     
     def get_display_name(self, obj):
-        return (obj.name or obj.email or '').strip() or obj.email
+        name = (obj.name or '').strip()
+        if name:
+            return name
+        email = (obj.email or '').strip()
+        if not email:
+            return ''
+        return email.split('@', 1)[0] or email
 
 
 class CupSerializer(serializers.ModelSerializer):
@@ -179,7 +185,10 @@ class MatchSerializer(serializers.ModelSerializer):
         sa_f = validated_data.get('score_a_final', instance.score_a_final)
         sb_f = validated_data.get('score_b_final', instance.score_b_final)
         if sa is not None and sb is not None and sa_f is not None and sb_f is not None:
-            validated_data['overtime'] = (sa != sa_f or sb != sb_f)
+            ot = (sa != sa_f or sb != sb_f)
+            if validated_data.get('shootout', instance.shootout):
+                ot = True
+            validated_data['overtime'] = ot
         return super().update(instance, validated_data)
     
     def get_has_started(self, obj):
@@ -260,7 +269,10 @@ class PlayoffSerializer(serializers.ModelSerializer):
         sa_f = validated_data.get('score_a_final', instance.score_a_final)
         sb_f = validated_data.get('score_b_final', instance.score_b_final)
         if sa is not None and sb is not None and sa_f is not None and sb_f is not None:
-            validated_data['overtime'] = (sa != sa_f or sb != sb_f)
+            ot = (sa != sa_f or sb != sb_f)
+            if validated_data.get('shootout', instance.shootout):
+                ot = True
+            validated_data['overtime'] = ot
         return super().update(instance, validated_data)
 
 

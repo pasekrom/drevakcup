@@ -42,6 +42,17 @@
       </div>
     </div>
 
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
+      <router-link
+        :to="`/cup/${cup.year}/tips-overview/excel`"
+        target="_blank"
+        rel="noopener"
+        class="btn btn-secondary w-full sm:w-auto text-center"
+      >
+        Excel přehled tipů
+      </router-link>
+    </div>
+
     <div class="grid md:grid-cols-2 gap-6 mb-8">
       <div class="card">
         <h2 class="text-xl font-bold mb-4">Rychlý přehled</h2>
