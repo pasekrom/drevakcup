@@ -47,10 +47,13 @@
         :to="`/cup/${cup.year}/tips-overview/excel`"
         target="_blank"
         rel="noopener"
-        class="btn btn-secondary w-full sm:w-auto text-center"
+        class="btn btn-danger w-full sm:w-auto text-center inline-flex items-center justify-center py-3"
       >
         Excel přehled tipů
       </router-link>
+      <p class="text-xs text-gray-500 sm:text-sm sm:ml-2 sm:max-w-[22rem]">
+        Kompletní tabulka tipů všech hráčů (velký přehled, scroll oběma směry).
+      </p>
     </div>
 
     <div class="grid md:grid-cols-2 gap-6 mb-8">
