@@ -67,6 +67,12 @@ const routes = [
     ],
   },
   {
+    path: '/cup/:year/tips-overview/excel',
+    name: 'cup-tips-overview-excel',
+    component: () => import('../views/cup/TipsOverviewExcelView.vue'),
+    meta: { requiresAuth: true, layout: 'blank' },
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue'),

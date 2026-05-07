@@ -6,61 +6,113 @@
       <p class="text-gray-600">Načítání...</p>
     </div>
 
-    <div v-else class="overflow-x-auto rounded-lg border border-gray-200">
-      <table class="w-full text-left" :class="cup?.tournament_started ? 'min-w-[36rem]' : 'min-w-[44rem]'">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th scope="col" class="py-3 px-4 font-semibold text-gray-700">Zápas</th>
-            <th scope="col" class="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Datum, čas</th>
-            <th scope="col" class="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Můj tip</th>
-            <th scope="col" class="py-3 px-4 font-semibold text-gray-700">Skóre</th>
-            <th
-              v-if="!cup?.tournament_started"
-              scope="col"
-              class="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap text-right"
-            >
-              Tip
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="match in matches"
-            :key="match.id"
-            class="border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
-          >
-            <td class="py-2.5 px-4">
-              <span class="flex items-center gap-2">
+    <template v-else>
+      <!-- Mobile: cards -->
+      <div class="sm:hidden space-y-3">
+        <div
+          v-for="match in matches"
+          :key="'m-' + match.id"
+          class="rounded-lg border border-gray-200 bg-white shadow-sm p-4"
+          :class="isToday(match.date) ? 'ring-2 ring-primary-200 bg-primary-50/40' : ''"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-semibold text-gray-900">
                 <TeamWithFlag :team="match.team_a" />
-                <span class="text-gray-400">–</span>
+                <span class="text-gray-400 mx-1">–</span>
                 <TeamWithFlag :team="match.team_b" />
-              </span>
-            </td>
-            <td class="py-2.5 px-4 text-gray-600 whitespace-nowrap">{{ formatDate(match.date) }}, {{ formatTime(match.date) }}</td>
-            <td class="py-2.5 px-4 text-sm tabular-nums text-primary-700 font-semibold whitespace-nowrap">
-              <span v-if="myTipText(match.id)">{{ myTipText(match.id) }}</span>
-              <span v-else class="font-normal text-gray-400">—</span>
-            </td>
-            <td class="py-2.5 px-4 text-lg font-bold tabular-nums">
-              <template v-if="finalScore(match) != null">
-                {{ finalScore(match).a }} : {{ finalScore(match).b }}
-                <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-600 ml-1">OT</span>
-              </template>
-              <span v-else class="text-gray-400 font-normal">– : –</span>
-            </td>
-            <td v-if="!cup?.tournament_started" class="py-2.5 px-4 text-right whitespace-nowrap">
-              <button
-                type="button"
-                class="btn btn-secondary text-sm py-1.5 px-3 whitespace-nowrap"
-                @click="openTipModal(match)"
+              </p>
+              <p class="text-sm text-gray-600 mt-1 whitespace-nowrap">
+                {{ formatDate(match.date) }}, {{ formatTime(match.date) }}
+              </p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="text-lg font-bold tabular-nums">
+                <template v-if="finalScore(match) != null">
+                  {{ finalScore(match).a }} : {{ finalScore(match).b }}
+                  <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-600 ml-1">OT</span>
+                </template>
+                <span v-else class="text-gray-400 font-normal">– : –</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between gap-3">
+            <div class="text-sm">
+              <span class="text-gray-500">Můj tip:</span>
+              <span v-if="myTipText(match.id)" class="ml-1 font-semibold tabular-nums text-primary-700">{{ myTipText(match.id) }}</span>
+              <span v-else class="ml-1 text-gray-400">—</span>
+            </div>
+            <button
+              v-if="!cup?.tournament_started"
+              type="button"
+              class="btn btn-secondary text-sm py-1.5 px-3 whitespace-nowrap"
+              @click="openTipModal(match)"
+            >
+              Upravit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop: table -->
+      <div class="hidden sm:block overflow-x-auto rounded-lg border border-gray-200">
+        <table class="w-full text-left" :class="cup?.tournament_started ? 'min-w-[36rem]' : 'min-w-[44rem]'">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th scope="col" class="py-3 px-4 font-semibold text-gray-700">Zápas</th>
+              <th scope="col" class="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Datum, čas</th>
+              <th scope="col" class="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Můj tip</th>
+              <th scope="col" class="py-3 px-4 font-semibold text-gray-700">Skóre</th>
+              <th
+                v-if="!cup?.tournament_started"
+                scope="col"
+                class="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap text-right"
               >
-                Upravit můj tip
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                Tip
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="match in matches"
+              :key="match.id"
+              class="border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
+              :class="isToday(match.date) ? 'bg-primary-50/40' : ''"
+            >
+              <td class="py-2.5 px-4">
+                <span class="flex items-center gap-2">
+                  <TeamWithFlag :team="match.team_a" />
+                  <span class="text-gray-400">–</span>
+                  <TeamWithFlag :team="match.team_b" />
+                </span>
+              </td>
+              <td class="py-2.5 px-4 text-gray-600 whitespace-nowrap">{{ formatDate(match.date) }}, {{ formatTime(match.date) }}</td>
+              <td class="py-2.5 px-4 text-sm tabular-nums text-primary-700 font-semibold whitespace-nowrap">
+                <span v-if="myTipText(match.id)">{{ myTipText(match.id) }}</span>
+                <span v-else class="font-normal text-gray-400">—</span>
+              </td>
+              <td class="py-2.5 px-4 text-lg font-bold tabular-nums">
+                <template v-if="finalScore(match) != null">
+                  {{ finalScore(match).a }} : {{ finalScore(match).b }}
+                  <span v-if="isOvertime(match)" class="text-xs font-medium text-amber-600 ml-1">OT</span>
+                </template>
+                <span v-else class="text-gray-400 font-normal">– : –</span>
+              </td>
+              <td v-if="!cup?.tournament_started" class="py-2.5 px-4 text-right whitespace-nowrap">
+                <button
+                  type="button"
+                  class="btn btn-secondary text-sm py-1.5 px-3 whitespace-nowrap"
+                  @click="openTipModal(match)"
+                >
+                  Upravit můj tip
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
 
     <MatchTipEditModal
       v-model="modalOpen"
@@ -151,6 +203,13 @@ function formatTime(dateString) {
   const h = String(d.getHours()).padStart(2, '0')
   const m = String(d.getMinutes()).padStart(2, '0')
   return `${h}:${m}`
+}
+
+function isToday(dateString) {
+  if (!dateString) return false
+  const d = new Date(dateString)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
 }
 
 function finalScore(match) {

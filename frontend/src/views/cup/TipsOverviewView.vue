@@ -1,6 +1,16 @@
 <template>
   <div>
-    <h2 class="text-2xl font-bold mb-2">Přehled tipů</h2>
+    <div class="flex items-start justify-between gap-4 mb-2">
+      <h2 class="text-2xl font-bold">Přehled tipů</h2>
+      <router-link
+        :to="`/cup/${cup.year}/tips-overview/excel`"
+        target="_blank"
+        rel="noopener"
+        class="text-sm font-medium text-primary-700 hover:text-primary-800 underline underline-offset-4 whitespace-nowrap"
+      >
+        Otevřít jako Excel
+      </router-link>
+    </div>
     <p class="text-gray-600 text-sm mb-6">
       Tipy všech hráčů u zápasů a u speciálu. Před začátkem prvního zápasu turnaje se místo tipů zobrazuje <span class="font-mono">?:?</span>.
     </p>
@@ -18,7 +28,72 @@
       <template v-else-if="!loadError">
         <!-- 1. část: zápasy -->
         <h3 class="text-lg font-bold text-gray-900 mb-3">1. část – zápasy</h3>
-        <div class="w-full max-w-full overflow-x-auto rounded-lg border border-gray-200 mb-12 shadow-sm">
+        <!-- Mobile: pick one user (matrix is too wide) -->
+        <div class="sm:hidden mb-8">
+          <label class="label">Hráč</label>
+          <select v-model="mobileUserIdMatches" class="input">
+            <option v-for="u in mobileOtherUsersMatches" :key="'mu-' + u.id" :value="String(u.id)">
+              {{ u.display_name }}
+            </option>
+          </select>
+
+          <div class="mt-4 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="divide-y divide-gray-100">
+              <div
+                v-for="m in matrix.matches"
+                :key="'mm-' + m.id"
+                class="px-4 py-3"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="font-semibold text-gray-900">
+                      <TeamWithFlag display="shortcut" :team="m.team_a" />
+                      <span class="text-gray-400 mx-1">–</span>
+                      <TeamWithFlag display="shortcut" :team="m.team_b" />
+                    </p>
+                    <p class="text-sm text-gray-600 mt-0.5">
+                      {{ formatMatchDate(m.date) }}
+                      <span v-if="matchResultText(m)" class="ml-2 font-semibold text-gray-900 tabular-nums">
+                        {{ matchResultText(m) }}
+                      </span>
+                      <span v-else class="ml-2 text-gray-400">—</span>
+                    </p>
+                  </div>
+                  <div class="text-right tabular-nums flex-shrink-0">
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-sm">
+                      <div class="text-gray-500 text-left">Já</div>
+                      <div class="text-gray-500 text-left truncate">{{ mobileOtherUserMatches?.display_name ?? 'Hráč' }}</div>
+
+                      <div class="text-gray-900 text-left">
+                        <template v-for="p in [matchTipPresentation(m, m.tips?.[mobileMyUserId], matrix.tournament_started)]" :key="'mmy-' + m.id">
+                          <span :class="p.classes">{{ p.text }}</span>
+                        </template>
+                      </div>
+                      <div class="text-gray-900 text-left">
+                        <template v-for="p in [matchTipPresentation(m, m.tips?.[mobileUserIdMatches], matrix.tournament_started)]" :key="'mmo-' + m.id">
+                          <span :class="p.classes">{{ p.text }}</span>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 border-t border-gray-200 px-4 py-3 text-sm font-semibold">
+              <div class="flex items-center justify-between">
+                <span>Celkem – část A</span>
+                <span class="tabular-nums">
+                  {{ mobileMyUserMatches?.points_part_a ?? 0 }}
+                  <span class="mx-2 text-gray-400 font-normal">|</span>
+                  {{ mobileOtherUserMatches?.points_part_a ?? 0 }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop: full matrix -->
+        <div class="hidden sm:block w-full max-w-full overflow-x-auto rounded-lg border border-gray-200 mb-12 shadow-sm">
           <table class="text-sm border-collapse min-w-max w-max">
             <thead>
               <tr class="bg-gray-100 border-b border-gray-200">
@@ -46,6 +121,7 @@
                 v-for="m in matrix.matches"
                 :key="m.id"
                 class="border-b border-gray-100 hover:bg-gray-50/80"
+                :class="isToday(m.date) ? 'bg-primary-50/40' : ''"
               >
                 <td class="sticky left-0 z-10 bg-white px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.04)] min-w-[9rem]">
                   <span class="inline-flex items-center gap-1.5 flex-wrap">
@@ -99,7 +175,88 @@
 
         <!-- 2. část: speciál -->
         <h3 class="text-lg font-bold text-gray-900 mb-3">2. část – speciální tipy</h3>
-        <div class="w-full max-w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <!-- Mobile: pick one user -->
+        <div class="sm:hidden mb-8">
+          <label class="label">Hráč</label>
+          <select v-model="mobileUserIdSpecial" class="input">
+            <option v-for="u in mobileOtherUsersSpecial" :key="'msu-' + u.id" :value="String(u.id)">
+              {{ u.display_name }}
+            </option>
+          </select>
+
+          <div class="mt-4 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="divide-y divide-gray-100">
+              <div
+                v-for="row in matrix.special_rows"
+                :key="'ms-' + row.tip_field"
+                class="px-4 py-3"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="font-semibold text-gray-900">
+                      {{ row.label }}
+                      <span class="ml-2 text-sm font-medium text-amber-900/90">({{ row.points }}b)</span>
+                    </p>
+                    <p class="text-sm text-gray-600 mt-0.5">
+                      Výsledek:
+                      <span class="ml-1 text-gray-900">{{ formatSpecialResult(row, matrix.special_result) }}</span>
+                    </p>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-sm">
+                      <div class="text-gray-500 text-left">Já</div>
+                      <div class="text-gray-500 text-left truncate">{{ mobileOtherUserSpecial?.display_name ?? 'Hráč' }}</div>
+
+                      <div class="text-gray-900 text-left">
+                        <template
+                          v-for="p in [
+                            specialTipPresentation(
+                              row,
+                              row.tips?.[mobileMyUserId],
+                              matrix.special_result,
+                              matrix.tournament_started,
+                            ),
+                          ]"
+                          :key="'smy-' + row.tip_field"
+                        >
+                          <span :class="p.classes">{{ p.text }}</span>
+                        </template>
+                      </div>
+                      <div class="text-gray-900 text-left">
+                        <template
+                          v-for="p in [
+                            specialTipPresentation(
+                              row,
+                              row.tips?.[mobileUserIdSpecial],
+                              matrix.special_result,
+                              matrix.tournament_started,
+                            ),
+                          ]"
+                          :key="'smo-' + row.tip_field"
+                        >
+                          <span :class="p.classes">{{ p.text }}</span>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 border-t border-gray-200 px-4 py-3 text-sm font-semibold">
+              <div class="flex items-center justify-between">
+                <span>Celkem – část B</span>
+                <span class="tabular-nums">
+                  {{ mobileMyUserSpecial?.points_part_b ?? 0 }}
+                  <span class="mx-2 text-gray-400 font-normal">|</span>
+                  {{ mobileOtherUserSpecial?.points_part_b ?? 0 }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop: full matrix -->
+        <div class="hidden sm:block w-full max-w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
           <table class="text-sm border-collapse min-w-max w-max">
             <thead>
               <tr class="bg-gray-100 border-b border-gray-200">
@@ -185,9 +342,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import api from '../../services/api'
 import TeamWithFlag from '../../components/TeamWithFlag.vue'
+import { useAuthStore } from '../../stores/auth'
 
 const props = defineProps({
   cup: { type: Object, required: true },
@@ -234,6 +392,67 @@ const usersSortedSpecial = computed(() => {
   return [...u].sort((a, b) => compareUsersByPointsThenName(a, b, 'points_part_b'))
 })
 
+const mobileUserIdMatches = ref('')
+const mobileUserIdSpecial = ref('')
+
+const authStore = useAuthStore()
+const mobileMyUserId = computed(() => {
+  const id = authStore.user?.id
+  return id == null ? '' : String(id)
+})
+
+const mobileOtherUsersMatches = computed(() => {
+  const myId = mobileMyUserId.value
+  const list = usersSortedMatches.value || []
+  return myId ? list.filter((u) => String(u.id) !== myId) : list
+})
+
+const mobileOtherUsersSpecial = computed(() => {
+  const myId = mobileMyUserId.value
+  const list = usersSortedSpecial.value || []
+  return myId ? list.filter((u) => String(u.id) !== myId) : list
+})
+
+watch([mobileOtherUsersMatches, mobileMyUserId], ([list, myId]) => {
+  if (!list?.length) return
+  const current = mobileUserIdMatches.value
+  if (!current || (myId && current === myId) || !list.some((u) => String(u.id) === String(current))) {
+    mobileUserIdMatches.value = String(list[0].id)
+  }
+}, { immediate: true })
+
+watch([mobileOtherUsersSpecial, mobileMyUserId], ([list, myId]) => {
+  if (!list?.length) return
+  const current = mobileUserIdSpecial.value
+  if (!current || (myId && current === myId) || !list.some((u) => String(u.id) === String(current))) {
+    mobileUserIdSpecial.value = String(list[0].id)
+  }
+}, { immediate: true })
+
+const mobileMyUserMatches = computed(() => {
+  const id = mobileMyUserId.value
+  if (!id) return null
+  return (matrix.value.users || []).find((u) => String(u.id) === String(id)) ?? null
+})
+
+const mobileOtherUserMatches = computed(() => {
+  const id = mobileUserIdMatches.value
+  if (!id) return null
+  return (matrix.value.users || []).find((u) => String(u.id) === String(id)) ?? null
+})
+
+const mobileMyUserSpecial = computed(() => {
+  const id = mobileMyUserId.value
+  if (!id) return null
+  return (matrix.value.users || []).find((u) => String(u.id) === String(id)) ?? null
+})
+
+const mobileOtherUserSpecial = computed(() => {
+  const id = mobileUserIdSpecial.value
+  if (!id) return null
+  return (matrix.value.users || []).find((u) => String(u.id) === String(id)) ?? null
+})
+
 function userColClass(index) {
   return USER_BG[index % USER_BG.length]
 }
@@ -274,6 +493,13 @@ function matchResultText(m) {
     s += ' p'
   }
   return s
+}
+
+function isToday(dateString) {
+  if (!dateString) return false
+  const d = new Date(dateString)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
 }
 
 function matchTipPresentation(match, tip, started) {

@@ -7,13 +7,6 @@
             Drevak Cup
           </router-link>
           <router-link
-            v-if="authStore.isAuthenticated"
-            to="/cups"
-            class="text-gray-700 hover:text-primary-600 transition-colors"
-          >
-            Turnaje
-          </router-link>
-          <router-link
             v-if="authStore.user?.is_staff"
             to="/admin/cups"
             class="text-gray-700 hover:text-primary-600 transition-colors"
