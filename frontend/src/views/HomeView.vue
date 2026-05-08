@@ -2,11 +2,8 @@
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-12">
       <h1 class="text-4xl font-bold text-gray-900 mb-4">
-        Drevak Cup
+        Dřevák Cup
       </h1>
-      <p class="text-xl text-gray-600">
-        IIHF Tournament Prediction Platform
-      </p>
     </div>
 
     <div v-if="currentCup" class="card mb-8">
