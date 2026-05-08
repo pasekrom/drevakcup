@@ -83,6 +83,7 @@ class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.select_related('team_a', 'team_b', 'cup')
     serializer_class = MatchSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None
     filterset_fields = ['cup', 'date']
     ordering_fields = ['date']
     ordering = ['date']
