@@ -9,95 +9,148 @@
     </div>
 
     <div v-else ref="sheetRef" class="h-full w-full overflow-auto">
-      <div class="inline-block">
+      <div class="inline-block pb-8">
         <table class="text-sm border-collapse min-w-max w-max">
-        <thead>
-          <tr class="bg-gray-100 border-b border-gray-200">
-            <th
-              class="bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[10rem]"
-            >
-              Zápas
-            </th>
-            <th
-              class="bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[7.25rem]"
-            >
-              Datum
-            </th>
-            <th
-              class="bg-gray-100 px-3 py-2 text-center font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[5.25rem]"
-            >
-              Výsledek
-            </th>
-            <th
-              v-for="(u, ui) in usersSortedMatches"
-              :key="'eh-' + u.id"
-              class="px-2 py-2 text-center font-semibold text-gray-800 whitespace-nowrap min-w-[5rem] border-r border-gray-200/80"
-              :class="[userColClass(ui), userHeaderClass(u, ui)]"
-              :data-user-col="String(u.id)"
-            >
-              {{ u.display_name }}
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr
-            v-for="m in matrix.matches"
-            :key="'er-' + m.id"
-            class="border-b border-gray-100 hover:bg-gray-50/80"
-            :class="isToday(m.date) ? 'bg-primary-50/40' : ''"
-          >
-            <td
-              class="bg-white px-3 py-2 border-r border-gray-200 min-w-[10rem]"
-            >
-              <span class="inline-flex items-center gap-1.5 flex-wrap">
-                <TeamWithFlag display="shortcut" :team="m.team_a" />
-                <span class="text-gray-400">–</span>
-                <TeamWithFlag display="shortcut" :team="m.team_b" />
-              </span>
-            </td>
-            <td class="px-3 py-2 text-gray-600 whitespace-nowrap border-r border-gray-200 bg-white">
-              {{ formatMatchDate(m.date) }}
-            </td>
-            <td class="px-3 py-2 text-center font-bold tabular-nums border-r border-gray-200 bg-gray-50/50">
-              <template v-if="matchResultText(m)">{{ matchResultText(m) }}</template>
-              <span v-else class="text-gray-400 font-normal">—</span>
-            </td>
-            <td
-              v-for="(u, ui) in usersSortedMatches"
-              :key="'ec-' + m.id + '-' + u.id"
-              class="px-2 py-2 text-center tabular-nums border-r border-gray-100"
-              :class="[userColClass(ui), userCellClass(u)]"
-            >
-              <template
-                v-for="p in [matchTipPresentation(m, m.tips?.[String(u.id)], matrix.tournament_started)]"
-                :key="'ep-' + m.id + '-' + u.id"
+          <thead>
+            <tr class="bg-gray-100 border-b border-gray-200">
+              <th
+                class="bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[14rem]"
               >
-                <span :class="p.classes">{{ p.text }}</span>
-              </template>
-            </td>
-          </tr>
-        </tbody>
+                Položka / zápas
+              </th>
+              <th
+                class="bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[7.25rem]"
+              >
+                Datum / body
+              </th>
+              <th
+                class="bg-gray-100 px-3 py-2 text-center font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[5.25rem]"
+              >
+                Výsledek
+              </th>
+              <th
+                v-for="(u, ui) in usersSorted"
+                :key="'eh-' + u.id"
+                class="px-2 py-2 text-center font-semibold text-gray-800 whitespace-nowrap min-w-[5rem] border-r border-gray-200/80"
+                :class="[userColClass(ui), userHeaderClass(u, ui)]"
+                :data-user-col="String(u.id)"
+              >
+                {{ u.display_name }}
+              </th>
+            </tr>
+          </thead>
 
-        <tfoot>
-          <tr class="bg-gray-100 border-t-2 border-gray-300 font-semibold text-gray-900">
-            <td
-              class="bg-gray-100 px-3 py-2 border-r border-gray-200"
-              colspan="3"
+          <tbody>
+            <tr
+              v-for="m in matrix.matches"
+              :key="'er-' + m.id"
+              class="border-b border-gray-100 hover:bg-gray-50/80"
+              :class="isToday(m.date) ? 'bg-primary-50/40' : ''"
             >
-              Celkem – část A
-            </td>
-            <td
-              v-for="(u, ui) in usersSortedMatches"
-              :key="'ef-' + u.id"
-              class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
-              :class="[userColClass(ui), userCellClass(u)]"
+              <td class="bg-white px-3 py-2 border-r border-gray-200">
+                <span class="inline-flex items-center gap-1.5 flex-wrap">
+                  <TeamWithFlag display="shortcut" :team="m.team_a" />
+                  <span class="text-gray-400">–</span>
+                  <TeamWithFlag display="shortcut" :team="m.team_b" />
+                </span>
+              </td>
+              <td class="px-3 py-2 text-gray-600 whitespace-nowrap border-r border-gray-200 bg-white">
+                {{ formatMatchDate(m.date) }}
+              </td>
+              <td class="px-3 py-2 text-center font-bold tabular-nums border-r border-gray-200 bg-gray-50/50">
+                <template v-if="matchResultText(m)">{{ matchResultText(m) }}</template>
+                <span v-else class="text-gray-400 font-normal">—</span>
+              </td>
+              <td
+                v-for="(u, ui) in usersSorted"
+                :key="'ec-' + m.id + '-' + u.id"
+                class="px-2 py-2 text-center tabular-nums border-r border-gray-100"
+                :class="[userColClass(ui), userCellClass(u)]"
+              >
+                <template
+                  v-for="p in [matchTipPresentation(m, m.tips?.[String(u.id)], matrix.tournament_started)]"
+                  :key="'ep-' + m.id + '-' + u.id"
+                >
+                  <span :class="p.classes">{{ p.text }}</span>
+                </template>
+              </td>
+            </tr>
+
+            <tr class="bg-amber-100/90 border-y-2 border-amber-300/80">
+              <td
+                class="px-3 py-2.5 text-center text-sm font-bold text-amber-950 tracking-wide"
+                :colspan="3 + usersSorted.length"
+              >
+                2. část – speciální tipy
+              </td>
+            </tr>
+
+            <tr
+              v-for="row in matrix.special_rows"
+              :key="'sr-' + row.tip_field"
+              class="border-b border-gray-100 hover:bg-gray-50/80"
             >
-              {{ u.points_part_a ?? 0 }}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+              <td class="px-3 py-2 text-gray-900 border-r border-gray-200 bg-white">
+                {{ row.label }}
+              </td>
+              <td class="px-2 py-2 text-center text-amber-900/90 font-medium border-r border-gray-200 bg-amber-50/40 whitespace-nowrap">
+                {{ row.points }}
+              </td>
+              <td class="px-3 py-2 text-center border-r border-gray-200 bg-gray-50/40 text-gray-900">
+                {{ formatSpecialResult(row, matrix.special_result) }}
+              </td>
+              <td
+                v-for="(u, ui) in usersSorted"
+                :key="'sec-' + row.tip_field + '-' + u.id"
+                class="px-2 py-2 text-center border-r border-gray-100"
+                :class="[userColClass(ui), userCellClass(u)]"
+              >
+                <template
+                  v-for="p in [
+                    specialTipPresentation(
+                      row,
+                      row.tips?.[String(u.id)],
+                      matrix.special_result,
+                      matrix.tournament_started,
+                    ),
+                  ]"
+                  :key="'sep-' + row.tip_field + '-' + u.id"
+                >
+                  <span :class="p.classes">{{ p.text }}</span>
+                </template>
+              </td>
+            </tr>
+          </tbody>
+
+          <tfoot>
+            <tr class="bg-gray-100 border-t-2 border-gray-300 font-semibold text-gray-900">
+              <td class="bg-gray-100 px-3 py-2 border-r border-gray-200" colspan="3">
+                Celkem – část A
+              </td>
+              <td
+                v-for="(u, ui) in usersSorted"
+                :key="'ef-a-' + u.id"
+                class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
+                :class="[userColClass(ui), userCellClass(u)]"
+              >
+                {{ u.points_part_a ?? 0 }}
+              </td>
+            </tr>
+            <tr class="bg-gray-100 border-t border-gray-200 font-semibold text-gray-900">
+              <td class="bg-gray-100 px-3 py-2 border-r border-gray-200" colspan="3">
+                Celkem – část B
+              </td>
+              <td
+                v-for="(u, ui) in usersSorted"
+                :key="'ef-b-' + u.id"
+                class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
+                :class="[userColClass(ui), userCellClass(u)]"
+              >
+                {{ u.points_part_b ?? 0 }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     </div>
   </div>
@@ -128,18 +181,27 @@ const matrix = ref({
 
 const USER_BG = ['bg-pink-50/90', 'bg-sky-50/90', 'bg-emerald-50/90', 'bg-amber-50/90']
 
-function compareUsersByPointsThenName(a, b, pointsField) {
-  const pa = Number(a[pointsField] ?? 0)
-  const pb = Number(b[pointsField] ?? 0)
-  if (pb !== pa) return pb - pa
+function compareUsersByTotalThenName(a, b) {
+  const ta = Number(a.points_part_a ?? 0) + Number(a.points_part_b ?? 0)
+  const tb = Number(b.points_part_a ?? 0) + Number(b.points_part_b ?? 0)
+  if (tb !== ta) return tb - ta
   return String(a.display_name || '').localeCompare(String(b.display_name || ''), 'cs', {
     sensitivity: 'base',
   })
 }
 
-const usersSortedMatches = computed(() => {
+/** Jedno pořadí sloupců pro zápasy i speciál (celkové body A+B, pak jméno). */
+const usersSorted = computed(() => {
   const u = matrix.value.users || []
-  return [...u].sort((a, b) => compareUsersByPointsThenName(a, b, 'points_part_a'))
+  return [...u].sort(compareUsersByTotalThenName)
+})
+
+const teamsById = computed(() => {
+  const m = new Map()
+  for (const t of matrix.value.teams || []) {
+    m.set(t.id, t)
+  }
+  return m
 })
 
 function userColClass(index) {
@@ -150,14 +212,6 @@ const myUserId = computed(() => {
   const id = authStore.user?.id
   return id == null ? '' : String(id)
 })
-
-const myUserColIndex = computed(() => {
-  const id = myUserId.value
-  if (!id) return -1
-  return usersSortedMatches.value.findIndex((u) => String(u.id) === id)
-})
-
-const myUserColIndexKnown = computed(() => myUserColIndex.value >= 0)
 
 function userHeaderClass(u, ui) {
   return String(u.id) === myUserId.value ? 'ring-2 ring-primary-300' : ''
@@ -243,6 +297,127 @@ function matchTipPresentation(match, tip, started) {
     return { text, classes: ['font-bold', 'text-gray-900'] }
   }
   return { text, classes: ['line-through', 'text-gray-600', 'font-normal'] }
+}
+
+function foldText(value) {
+  if (value == null) return ''
+  let s = String(value).trim().toLowerCase()
+  if (!s) return ''
+  try {
+    return s.normalize('NFD').replace(/\p{M}/gu, '')
+  } catch {
+    return s.replace(/[\u0300-\u036f]/g, '')
+  }
+}
+
+function teamName(id) {
+  if (id == null) return '—'
+  const t = teamsById.value.get(id)
+  if (!t) return '—'
+  return t.display_name || t.name || '—'
+}
+
+function formatSpecialResult(row, sr) {
+  if (!sr) return '—'
+  const v = sr[row.result_field]
+  if (row.field_type === 'team') {
+    return teamName(v)
+  }
+  if (row.field_type === 'text') {
+    const s = String(v ?? '').trim()
+    return s || '—'
+  }
+  if (v == null && v !== 0) return '—'
+  return String(v)
+}
+
+function formatSpecialTipValue(row, tipVal) {
+  if (row.field_type === 'number') {
+    if (tipVal == null || tipVal === '') return '—'
+    return String(tipVal)
+  }
+  if (tipVal == null || tipVal === '') return '—'
+  if (row.field_type === 'team') return teamName(tipVal)
+  if (row.field_type === 'text') return String(tipVal).trim() || '—'
+  return String(tipVal)
+}
+
+function specialResultKnown(row, sr) {
+  if (!sr) return false
+  const v = sr[row.result_field]
+  if (row.field_type === 'team') return v != null
+  if (row.field_type === 'text') return !!foldText(String(v ?? ''))
+  return v != null && v !== ''
+}
+
+function specialTipPresentation(row, tipVal, sr, started) {
+  if (!started) {
+    return { text: '?:?', classes: ['text-gray-500', 'font-mono'] }
+  }
+  if (row.field_type === 'number') {
+    if (tipVal == null || tipVal === '') {
+      return { text: '—', classes: ['text-gray-400'] }
+    }
+  } else if (tipVal == null || tipVal === '') {
+    return { text: '—', classes: ['text-gray-400'] }
+  }
+
+  const text = formatSpecialTipValue(row, tipVal)
+
+  if (!specialResultKnown(row, sr)) {
+    return { text, classes: ['text-gray-800'] }
+  }
+
+  const res = sr[row.result_field]
+  const mode = row.mode
+
+  if (mode === 'exact' && row.field_type === 'team') {
+    if (tipVal === res && res != null) return { text, classes: ['font-bold', 'underline', 'text-gray-900'] }
+    if (res == null) return { text, classes: ['text-gray-800'] }
+    return { text, classes: ['line-through', 'text-gray-600', 'font-normal'] }
+  }
+
+  if (mode === 'either_final' && row.field_type === 'team') {
+    const saId = sr.final_a_id
+    const sbId = sr.final_b_id
+    if (!saId && !sbId) return { text, classes: ['text-gray-800'] }
+    const pick = tipVal
+    if (pick == null) return { text: '—', classes: ['text-gray-400'] }
+    const hit = (!!saId && pick === saId) || (!!sbId && pick === sbId)
+    if (hit) return { text, classes: ['font-bold', 'text-gray-900'] }
+    return { text, classes: ['line-through', 'text-gray-600', 'font-normal'] }
+  }
+
+  if (mode === 'either_bronze' && row.field_type === 'team') {
+    const baId = sr.bronze_a_id
+    const bbId = sr.bronze_b_id
+    if (!baId && !bbId) return { text, classes: ['text-gray-800'] }
+    const pick = tipVal
+    if (pick == null) return { text: '—', classes: ['text-gray-400'] }
+    const hit = (!!baId && pick === baId) || (!!bbId && pick === bbId)
+    if (hit) return { text, classes: ['font-bold', 'text-gray-900'] }
+    return { text, classes: ['line-through', 'text-gray-600', 'font-normal'] }
+  }
+
+  if (mode === 'fold_text' && row.field_type === 'text') {
+    const fr = foldText(String(res ?? ''))
+    if (!fr) return { text, classes: ['text-gray-800'] }
+    const ft = foldText(String(tipVal ?? ''))
+    if (ft && ft === fr) return { text, classes: ['font-bold', 'underline', 'text-gray-900'] }
+    if (ft) return { text, classes: ['line-through', 'text-gray-600', 'font-normal'] }
+    return { text: '—', classes: ['text-gray-400'] }
+  }
+
+  if (mode === 'exact_num' && row.field_type === 'number') {
+    const nr = Number(res)
+    if (Number.isNaN(nr)) return { text, classes: ['text-gray-800'] }
+    const nt = Number(tipVal)
+    if (Number.isNaN(nt)) return { text: '—', classes: ['text-gray-400'] }
+    if (nt === nr) return { text, classes: ['font-bold', 'underline', 'text-gray-900'] }
+    return { text, classes: ['line-through', 'text-gray-600', 'font-normal'] }
+  }
+
+  return { text, classes: ['text-gray-800'] }
 }
 
 </script>
