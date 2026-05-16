@@ -14,25 +14,25 @@
           <thead>
             <tr class="bg-gray-100 border-b border-gray-200">
               <th
-                class="bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[14rem]"
+                class="sticky top-0 left-0 z-30 bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[14rem] shadow-[2px_2px_4px_rgba(0,0,0,0.06)]"
               >
                 Položka / zápas
               </th>
               <th
-                class="bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[7.25rem]"
+                class="sticky top-0 z-20 bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[7.25rem]"
               >
                 Datum / body
               </th>
               <th
-                class="bg-gray-100 px-3 py-2 text-center font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[5.25rem]"
+                class="sticky top-0 z-20 bg-gray-100 px-3 py-2 text-center font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[5.25rem]"
               >
                 Výsledek
               </th>
               <th
                 v-for="(u, ui) in usersSorted"
                 :key="'eh-' + u.id"
-                class="px-2 py-2 text-center font-semibold text-gray-800 whitespace-nowrap min-w-[5rem] border-r border-gray-200/80"
-                :class="[userColClass(ui), userHeaderClass(u, ui)]"
+                class="sticky top-0 z-20 px-2 py-2 text-center font-semibold text-gray-800 whitespace-nowrap min-w-[5rem] border-r border-gray-200/80"
+                :class="[userHeaderColClass(ui), userHeaderClass(u, ui)]"
                 :data-user-col="String(u.id)"
               >
                 {{ u.display_name }}
@@ -47,7 +47,10 @@
               class="border-b border-gray-100 hover:bg-gray-50/80"
               :class="isToday(m.date) ? 'bg-primary-50/40' : ''"
             >
-              <td class="bg-white px-3 py-2 border-r border-gray-200">
+              <td
+                class="sticky left-0 z-10 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.04)]"
+                :class="isToday(m.date) ? 'bg-primary-50' : 'bg-white'"
+              >
                 <span class="inline-flex items-center gap-1.5 flex-wrap">
                   <TeamWithFlag display="shortcut" :team="m.team_a" />
                   <span class="text-gray-400">–</span>
@@ -90,7 +93,7 @@
               :key="'sr-' + row.tip_field"
               class="border-b border-gray-100 hover:bg-gray-50/80"
             >
-              <td class="px-3 py-2 text-gray-900 border-r border-gray-200 bg-white">
+              <td class="sticky left-0 z-10 bg-white px-3 py-2 text-gray-900 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                 {{ row.label }}
               </td>
               <td class="px-2 py-2 text-center text-amber-900/90 font-medium border-r border-gray-200 bg-amber-50/40 whitespace-nowrap">
@@ -124,7 +127,10 @@
 
           <tfoot>
             <tr class="bg-gray-100 border-t-2 border-gray-300 font-semibold text-gray-900">
-              <td class="bg-gray-100 px-3 py-2 border-r border-gray-200" colspan="3">
+              <td
+                class="sticky left-0 z-10 bg-gray-100 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.06)]"
+                colspan="3"
+              >
                 Celkem – část A
               </td>
               <td
@@ -137,7 +143,10 @@
               </td>
             </tr>
             <tr class="bg-gray-100 border-t border-gray-200 font-semibold text-gray-900">
-              <td class="bg-gray-100 px-3 py-2 border-r border-gray-200" colspan="3">
+              <td
+                class="sticky left-0 z-10 bg-gray-100 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.06)]"
+                colspan="3"
+              >
                 Celkem – část B
               </td>
               <td
@@ -180,6 +189,7 @@ const matrix = ref({
 })
 
 const USER_BG = ['bg-pink-50/90', 'bg-sky-50/90', 'bg-emerald-50/90', 'bg-amber-50/90']
+const USER_HDR_BG = ['bg-pink-50', 'bg-sky-50', 'bg-emerald-50', 'bg-amber-50']
 
 function compareUsersByTotalThenName(a, b) {
   const ta = Number(a.points_part_a ?? 0) + Number(a.points_part_b ?? 0)
@@ -206,6 +216,10 @@ const teamsById = computed(() => {
 
 function userColClass(index) {
   return USER_BG[index % USER_BG.length]
+}
+
+function userHeaderColClass(index) {
+  return USER_HDR_BG[index % USER_HDR_BG.length]
 }
 
 const myUserId = computed(() => {
