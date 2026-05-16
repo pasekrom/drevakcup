@@ -345,7 +345,7 @@ const sections = computed(() => [
       },
       {
         key: 'max_goals_per_game',
-        label: 'Nejvíce branek v jednom utkání (dohromady)',
+        label: 'Nejvíce branek v jednom utkání',
         type: 'number',
         teams: null,
         resultKey: 'max_goals_per_game',
@@ -354,7 +354,7 @@ const sections = computed(() => [
       },
       {
         key: 'overtimes',
-        label: 'Počet remíz/prodloužení (celkem za MS)',
+        label: 'Počet remíz/prodloužení',
         type: 'number',
         teams: null,
         resultKey: 'overtimes',

@@ -20,7 +20,7 @@ SPECIAL_MATRIX_ROWS: list[tuple[str, str, str, int, str, str]] = [
     ('bronze_b_id', 'bronze_b_id', 'Tým 2, který se utká o bronz', 12, 'either_bronze', 'team'),
     ('czech_shooter_first', 'czech_shooter_first', 'Český střelec 1. gólu', 12, 'fold_text', 'text'),
     ('czech_shooter_last', 'czech_shooter_last', 'Český střelec posledního gólu', 12, 'fold_text', 'text'),
-    ('max_goals_per_game', 'max_goals_per_game', 'Nejvíce branek v jednom utkání (dohromady)', 12, 'exact_num', 'number'),
+    ('max_goals_per_game', 'max_goals_per_game', 'Nejvíce branek v jednom utkání', 12, 'exact_num', 'number'),
     ('group_a_1_id', 'group_a_1_id', 'Vítěz skupiny A', 9, 'exact', 'team'),
     ('group_b_1_id', 'group_b_1_id', 'Vítěz skupiny B', 9, 'exact', 'team'),
     ('group_a_2_id', 'group_a_2_id', '2. místo ve skupině A', 6, 'exact', 'team'),
@@ -35,7 +35,7 @@ SPECIAL_MATRIX_ROWS: list[tuple[str, str, str, int, str, str]] = [
     ('team_last_goal_id', 'team_last_goal_id', 'Tým – poslední branka MS', 12, 'exact', 'team'),
     ('team_drop_a_id', 'team_drop_a_id', 'Sestup ze skupiny A', 6, 'exact', 'team'),
     ('team_drop_b_id', 'team_drop_b_id', 'Sestup ze skupiny B', 6, 'exact', 'team'),
-    ('overtimes', 'overtimes', 'Počet remíz/prodloužení (celkem za MS)', 24, 'exact_num', 'number'),
+    ('overtimes', 'overtimes', 'Počet remíz/prodloužení', 24, 'exact_num', 'number'),
 ]
 
 

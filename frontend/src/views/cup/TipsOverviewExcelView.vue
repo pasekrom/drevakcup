@@ -14,7 +14,7 @@
           <thead>
             <tr class="bg-gray-100 border-b border-gray-200">
               <th
-                class="sticky top-0 left-0 z-30 bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[14rem] shadow-[2px_2px_4px_rgba(0,0,0,0.06)]"
+                class="sticky top-0 left-0 z-30 bg-gray-100 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap border-r border-gray-200 min-w-[9rem] shadow-[2px_2px_4px_rgba(0,0,0,0.06)]"
               >
                 Položka / zápas
               </th>
@@ -48,10 +48,10 @@
               :class="isToday(m.date) ? 'bg-primary-50/40' : ''"
             >
               <td
-                class="sticky left-0 z-10 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.04)]"
+                class="sticky left-0 z-10 px-3 py-2 border-r border-gray-200 whitespace-nowrap shadow-[2px_0_4px_rgba(0,0,0,0.04)] min-w-[9rem]"
                 :class="isToday(m.date) ? 'bg-primary-50' : 'bg-white'"
               >
-                <span class="inline-flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center gap-1.5">
                   <TeamWithFlag display="shortcut" :team="m.team_a" />
                   <span class="text-gray-400">–</span>
                   <TeamWithFlag display="shortcut" :team="m.team_b" />
@@ -93,7 +93,9 @@
               :key="'sr-' + row.tip_field"
               class="border-b border-gray-100 hover:bg-gray-50/80"
             >
-              <td class="sticky left-0 z-10 bg-white px-3 py-2 text-gray-900 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
+              <td
+                class="sticky left-0 z-10 bg-white px-2 sm:px-3 py-2 text-gray-900 border-r border-gray-200 max-w-[8.5rem] sm:max-w-[10.5rem] whitespace-normal leading-snug break-words align-top shadow-[2px_0_4px_rgba(0,0,0,0.04)]"
+              >
                 {{ row.label }}
               </td>
               <td class="px-2 py-2 text-center text-amber-900/90 font-medium border-r border-gray-200 bg-amber-50/40 whitespace-nowrap">
