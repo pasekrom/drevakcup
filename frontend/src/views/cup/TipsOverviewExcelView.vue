@@ -60,7 +60,7 @@
               <td class="px-3 py-2 text-gray-600 whitespace-nowrap border-r border-gray-200 bg-white">
                 {{ formatMatchDate(m.date) }}
               </td>
-              <td class="px-3 py-2 text-center font-bold tabular-nums border-r border-gray-200 bg-gray-50/50">
+              <td class="px-3 py-2 text-center font-bold tabular-nums border-r border-gray-200 bg-gray-50/50 whitespace-nowrap">
                 <template v-if="matchResultText(m)">{{ matchResultText(m) }}</template>
                 <span v-else class="text-gray-400 font-normal">—</span>
               </td>
@@ -130,15 +130,15 @@
           <tfoot>
             <tr class="bg-gray-100 border-t-2 border-gray-300 font-semibold text-gray-900">
               <td
-                class="sticky left-0 z-10 bg-gray-100 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.06)]"
-                colspan="3"
+                class="sticky left-0 z-10 bg-gray-100 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.06)] whitespace-nowrap min-w-[9rem]"
               >
                 Celkem – část A
               </td>
+              <td class="bg-gray-100 border-r border-gray-200" colspan="2" />
               <td
                 v-for="(u, ui) in usersSorted"
                 :key="'ef-a-' + u.id"
-                class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
+                class="bg-gray-100 px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
                 :class="[userColClass(ui), userCellClass(u)]"
               >
                 {{ u.points_part_a ?? 0 }}
@@ -146,15 +146,15 @@
             </tr>
             <tr class="bg-gray-100 border-t border-gray-200 font-semibold text-gray-900">
               <td
-                class="sticky left-0 z-10 bg-gray-100 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.06)]"
-                colspan="3"
+                class="sticky left-0 z-10 bg-gray-100 px-3 py-2 border-r border-gray-200 shadow-[2px_0_4px_rgba(0,0,0,0.06)] whitespace-nowrap min-w-[9rem]"
               >
                 Celkem – část B
               </td>
+              <td class="bg-gray-100 border-r border-gray-200" colspan="2" />
               <td
                 v-for="(u, ui) in usersSorted"
                 :key="'ef-b-' + u.id"
-                class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
+                class="bg-gray-100 px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
                 :class="[userColClass(ui), userCellClass(u)]"
               >
                 {{ u.points_part_b ?? 0 }}
@@ -280,7 +280,7 @@ function matchResultText(m) {
   if (a == null || b == null) return null
   let s = `${a} : ${b}`
   if (m.overtime || (m.score_a != null && m.score_a_final != null && (m.score_a !== m.score_a_final || m.score_b !== m.score_b_final))) {
-    s += m.shootout ? ' nájezdy' : ' prodloužení'
+    s += m.shootout ? ' NÁJ' : ' PRO'
   }
   return s
 }
