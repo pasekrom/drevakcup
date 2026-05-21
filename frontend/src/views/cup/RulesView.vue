@@ -24,7 +24,7 @@
           <li>Tým, který sestoupí ze skupiny A: <strong>6 bodů</strong></li>
           <li>Tým, který sestoupí ze skupiny B: <strong>6 bodů</strong></li>
           <li>Počet remíz/prodloužení za celé MS: <strong>24 bodů</strong></li>
-          <li>Nejvíce branek na MS v jednom utkání (počet dohromady za oba týmy v ZHD): <strong>12 bodů</strong></li>
+          <li>Nejvíce branek na MS v jednom utkání (počet dohromady za oba týmy): <strong>12 bodů</strong></li>
           <li>Tým 1, který se utká o bronz: <strong>12 bodů</strong></li>
           <li>Tým 2, který se utká o bronz: <strong>12 bodů</strong></li>
           <li>Finalista: <strong>16 bodů</strong></li>
