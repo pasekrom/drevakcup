@@ -37,7 +37,11 @@
 
         <div class="mt-4 pt-4 border-t border-gray-200 space-y-2 text-sm text-gray-600 leading-relaxed">
           <p>
-            <sup class="text-primary-600 font-semibold mr-1">*</sup><sup class="text-primary-600 font-semibold mr-1">**</sup>
+            <sup class="text-primary-600 font-semibold mr-1">*</sup>
+            Pouze v ZHD + prodloužení; nepočítají se samostatné nájezdy, které následují po prodloužení.
+          </p>
+          <p>
+            <sup class="text-primary-600 font-semibold mr-1">**</sup>
             Pouze v ZHD + prodloužení; nepočítají se samostatné nájezdy, které následují po prodloužení.
           </p>
           <p>
