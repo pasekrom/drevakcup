@@ -8,6 +8,7 @@ from django.templatetags.static import static as django_static
 from .flag_urls import public_or_request_url
 from .models import Cup, Match, MatchTip, Special, SpecialTip, Team, User, UserPoint
 from .team_flags import get_team_display_label
+from .ranking import load_tiebreak_stats
 from .services import is_tournament_started
 
 
@@ -137,12 +138,16 @@ def build_tips_matrix(cup: Cup, request=None) -> dict:
             return ''
         return email.split('@', 1)[0] or email
 
+    tiebreaks = load_tiebreak_stats(cup, {u.id for u in users})
     user_payload = [
         {
             'id': u.id,
             'display_name': _display_name(u),
             'points_part_a': points_a.get(u.id, 0),
             'points_part_b': points_b.get(u.id, 0),
+            'tiebreak_winner_guessed': tiebreaks[u.id]['winner_guessed'],
+            'tiebreak_exact_7_count': tiebreaks[u.id]['exact_7_count'],
+            'tiebreak_final_b_guessed': tiebreaks[u.id]['final_b_guessed'],
         }
         for u in users
     ]

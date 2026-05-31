@@ -173,6 +173,7 @@ import { useRoute } from 'vue-router'
 import api from '../../services/api'
 import TeamWithFlag from '../../components/TeamWithFlag.vue'
 import { useAuthStore } from '../../stores/auth'
+import { compareUsersByRanking } from '../../utils/userRanking'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -193,19 +194,10 @@ const matrix = ref({
 const USER_BG = ['bg-pink-50/90', 'bg-sky-50/90', 'bg-emerald-50/90', 'bg-amber-50/90']
 const USER_HDR_BG = ['bg-pink-50', 'bg-sky-50', 'bg-emerald-50', 'bg-amber-50']
 
-function compareUsersByTotalThenName(a, b) {
-  const ta = Number(a.points_part_a ?? 0) + Number(a.points_part_b ?? 0)
-  const tb = Number(b.points_part_a ?? 0) + Number(b.points_part_b ?? 0)
-  if (tb !== ta) return tb - ta
-  return String(a.display_name || '').localeCompare(String(b.display_name || ''), 'cs', {
-    sensitivity: 'base',
-  })
-}
-
-/** Jedno pořadí sloupců pro zápasy i speciál (celkové body A+B, pak jméno). */
+/** Jedno pořadí sloupců pro zápasy i speciál (celkové body A+B + tiebreak). */
 const usersSorted = computed(() => {
   const u = matrix.value.users || []
-  return [...u].sort(compareUsersByTotalThenName)
+  return [...u].sort(compareUsersByRanking)
 })
 
 const teamsById = computed(() => {

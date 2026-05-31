@@ -20,7 +20,7 @@
           <li>Tým, který vstřelí nejvíce branek (dle pravidel IIHF): <strong>12 bodů</strong></li>
           <li>Tým, který obdrží nejméně branek (dle pravidel IIHF): <strong>12 bodů</strong></li>
           <li>Tým, který vstřelí první branku: <strong>3 body</strong></li>
-          <li>Tým, který vstřelí poslední branku na MS: <strong>12 bodů</strong></li>
+          <li>Tým, který vstřelí poslední branku na MS<sup class="text-primary-600 font-semibold">***</sup>: <strong>12 bodů</strong></li>
           <li>Tým, který sestoupí ze skupiny A: <strong>6 bodů</strong></li>
           <li>Tým, který sestoupí ze skupiny B: <strong>6 bodů</strong></li>
           <li>Počet remíz/prodloužení za celé MS: <strong>24 bodů</strong></li>
@@ -31,9 +31,21 @@
           <li>Vítěz: <strong>24 bodů</strong></li>
           <li>Vítěz každé skupiny (A, B): <strong>9 bodů</strong></li>
           <li>2. - 4. místo každé skupiny (A, B): <strong>6 bodů</strong></li>
-          <li>Střelec 1. gólu ČR: <strong>12 bodů</strong></li>
-          <li>Střelec posledního gólu ČR: <strong>12 bodů</strong></li>
+          <li>Střelec 1. gólu ČR<sup class="text-primary-600 font-semibold">*</sup>: <strong>12 bodů</strong></li>
+          <li>Střelec posledního gólu ČR<sup class="text-primary-600 font-semibold">**</sup>: <strong>12 bodů</strong></li>
         </ul>
+
+        <div class="mt-4 pt-4 border-t border-gray-200 space-y-2 text-sm text-gray-600 leading-relaxed">
+          <p>
+            <sup class="text-primary-600 font-semibold mr-1">*</sup><sup class="text-primary-600 font-semibold mr-1">**</sup>
+            Pouze v ZHD + prodloužení; nepočítají se samostatné nájezdy, které následují po prodloužení.
+          </p>
+          <p>
+            <sup class="text-primary-600 font-semibold mr-1">***</sup>
+            Nepočítají se případné jednotlivé samostatné nájezdy po prodloužení, ale pouze výsledek celkově nájezdů
+            (např. nájezdy vyhraje Česko vs. Kanada 2:1, tak poslední gól vstřelilo Česko).
+          </p>
+        </div>
       </div>
       
       <div>

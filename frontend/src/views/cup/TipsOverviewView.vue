@@ -107,7 +107,7 @@
                   Výsledek
                 </th>
                 <th
-                  v-for="(u, ui) in usersSortedMatches"
+                  v-for="(u, ui) in usersSorted"
                   :key="'h-' + u.id"
                   class="px-2 py-2 text-center font-semibold text-gray-800 whitespace-nowrap min-w-[4.75rem] border-r border-gray-200/80"
                   :class="userColClass(ui)"
@@ -138,7 +138,7 @@
                   <span v-else class="text-gray-400 font-normal">—</span>
                 </td>
                 <td
-                  v-for="(u, ui) in usersSortedMatches"
+                  v-for="(u, ui) in usersSorted"
                   :key="m.id + '-' + u.id"
                   class="px-2 py-2 text-center tabular-nums border-r border-gray-100"
                   :class="userColClass(ui)"
@@ -161,7 +161,7 @@
                   Celkem – část A
                 </td>
                 <td
-                  v-for="(u, ui) in usersSortedMatches"
+                  v-for="(u, ui) in usersSorted"
                   :key="'fa-' + u.id"
                   class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
                   :class="userColClass(ui)"
@@ -270,7 +270,7 @@
                   Výsledek
                 </th>
                 <th
-                  v-for="(u, ui) in usersSortedSpecial"
+                  v-for="(u, ui) in usersSorted"
                   :key="'sh-' + u.id"
                   class="px-2 py-2 text-center font-semibold text-gray-800 whitespace-nowrap min-w-[5rem] border-r border-gray-200/80"
                   :class="userColClass(ui)"
@@ -295,7 +295,7 @@
                   {{ formatSpecialResult(row, matrix.special_result) }}
                 </td>
                 <td
-                  v-for="(u, ui) in usersSortedSpecial"
+                  v-for="(u, ui) in usersSorted"
                   :key="row.tip_field + '-' + u.id"
                   class="px-2 py-2 text-center border-r border-gray-100"
                   :class="userColClass(ui)"
@@ -325,7 +325,7 @@
                   Celkem – část B
                 </td>
                 <td
-                  v-for="(u, ui) in usersSortedSpecial"
+                  v-for="(u, ui) in usersSorted"
                   :key="'fb-' + u.id"
                   class="px-2 py-2 text-center tabular-nums border-r border-gray-200/80"
                   :class="userColClass(ui)"
@@ -346,6 +346,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import api from '../../services/api'
 import TeamWithFlag from '../../components/TeamWithFlag.vue'
 import { useAuthStore } from '../../stores/auth'
+import { compareUsersByRanking } from '../../utils/userRanking'
 
 const props = defineProps({
   cup: { type: Object, required: true },
@@ -373,23 +374,9 @@ const teamsById = computed(() => {
   return m
 })
 
-function compareUsersByPointsThenName(a, b, pointsField) {
-  const pa = Number(a[pointsField] ?? 0)
-  const pb = Number(b[pointsField] ?? 0)
-  if (pb !== pa) return pb - pa
-  return String(a.display_name || '').localeCompare(String(b.display_name || ''), 'cs', {
-    sensitivity: 'base',
-  })
-}
-
-const usersSortedMatches = computed(() => {
+const usersSorted = computed(() => {
   const u = matrix.value.users || []
-  return [...u].sort((a, b) => compareUsersByPointsThenName(a, b, 'points_part_a'))
-})
-
-const usersSortedSpecial = computed(() => {
-  const u = matrix.value.users || []
-  return [...u].sort((a, b) => compareUsersByPointsThenName(a, b, 'points_part_b'))
+  return [...u].sort(compareUsersByRanking)
 })
 
 const mobileUserIdMatches = ref('')
@@ -403,13 +390,13 @@ const mobileMyUserId = computed(() => {
 
 const mobileOtherUsersMatches = computed(() => {
   const myId = mobileMyUserId.value
-  const list = usersSortedMatches.value || []
+  const list = usersSorted.value || []
   return myId ? list.filter((u) => String(u.id) !== myId) : list
 })
 
 const mobileOtherUsersSpecial = computed(() => {
   const myId = mobileMyUserId.value
-  const list = usersSortedSpecial.value || []
+  const list = usersSorted.value || []
   return myId ? list.filter((u) => String(u.id) !== myId) : list
 })
 

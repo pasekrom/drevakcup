@@ -17,8 +17,39 @@ from .serializers import (
     MatchTipSerializer, SpecialTipSerializer, SpecialSerializer,
     UserPointSerializer, LadderSerializer, UserSerializer
 )
+from .ranking import ladder_sort_key, load_tiebreak_stats
 from .services import calculate_points, is_tournament_started
 from .tips_matrix import build_tips_matrix
+
+
+def _build_sorted_ladder(cup, users):
+    """Sestaví žebříček seřazený dle celkových bodů a tiebreak kritérií."""
+    points_a_dict = {
+        p.user_id: p.points
+        for p in UserPoint.objects.filter(cup=cup, part='A').select_related('user')
+    }
+    points_b_dict = {
+        p.user_id: p.points
+        for p in UserPoint.objects.filter(cup=cup, part='B').select_related('user')
+    }
+    user_ids = {u.id for u in users}
+    tiebreaks = load_tiebreak_stats(cup, user_ids)
+    ladder_data = []
+    for user in users:
+        pa = points_a_dict.get(user.id, 0)
+        pb = points_b_dict.get(user.id, 0)
+        ladder_data.append({
+            'user': user,
+            'points_a': pa,
+            'points_b': pb,
+            'points_c': pa + pb,
+            'tiebreak': tiebreaks[user.id],
+            'rank': 0,
+        })
+    ladder_data.sort(key=ladder_sort_key)
+    for rank, item in enumerate(ladder_data, 1):
+        item['rank'] = rank
+    return ladder_data
 
 
 class CupViewSet(viewsets.ModelViewSet):
@@ -416,35 +447,8 @@ class UserPointViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             cup = get_object_or_404(Cup, year=year)
         
-        # Get all user points for this cup
-        points_a = UserPoint.objects.filter(cup=cup, part='A').select_related('user')
-        points_b = UserPoint.objects.filter(cup=cup, part='B').select_related('user')
-        points_c = UserPoint.objects.filter(cup=cup, part='C').select_related('user')
-        
-        # Create dictionaries for quick lookup
-        points_a_dict = {p.user_id: p.points for p in points_a}
-        points_b_dict = {p.user_id: p.points for p in points_b}
-        points_c_dict = {p.user_id: p.points for p in points_c}
-        
-        # Include all active users (show 0 points if no UserPoint yet)
         users = User.objects.filter(is_active=True).order_by('email')
-        
-        # Build ladder (pass User instances so LadderSerializer can nest UserSerializer)
-        ladder_data = []
-        for user in users:
-            ladder_data.append({
-                'user': user,
-                'points_a': points_a_dict.get(user.id, 0),
-                'points_b': points_b_dict.get(user.id, 0),
-                'points_c': points_c_dict.get(user.id, 0),
-                'rank': 0
-            })
-        
-        # Sort by total points (part C), then by email for stable order at 0
-        ladder_data.sort(key=lambda x: (-x['points_c'], (x['user'].email or '')))
-        for rank, item in enumerate(ladder_data, 1):
-            item['rank'] = rank
-        
+        ladder_data = _build_sorted_ladder(cup, users)
         serializer = LadderSerializer(ladder_data, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -469,25 +473,8 @@ def leaderboard_view(request):
         cup = get_object_or_404(Cup, id=cup_id)
     else:
         cup = get_object_or_404(Cup, year=year)
-    points_a = UserPoint.objects.filter(cup=cup, part='A').select_related('user')
-    points_b = UserPoint.objects.filter(cup=cup, part='B').select_related('user')
-    points_c = UserPoint.objects.filter(cup=cup, part='C').select_related('user')
-    points_a_dict = {p.user_id: p.points for p in points_a}
-    points_b_dict = {p.user_id: p.points for p in points_b}
-    points_c_dict = {p.user_id: p.points for p in points_c}
     users = User.objects.filter(is_active=True).order_by('email')
-    ladder_data = []
-    for user in users:
-        ladder_data.append({
-            'user': user,
-            'points_a': points_a_dict.get(user.id, 0),
-            'points_b': points_b_dict.get(user.id, 0),
-            'points_c': points_c_dict.get(user.id, 0),
-            'rank': 0,
-        })
-    ladder_data.sort(key=lambda x: (-x['points_c'], (x['user'].email or '')))
-    for rank, item in enumerate(ladder_data, 1):
-        item['rank'] = rank
+    ladder_data = _build_sorted_ladder(cup, users)
     return Response(LadderSerializer(ladder_data, many=True, context={'request': request}).data)
 
 
